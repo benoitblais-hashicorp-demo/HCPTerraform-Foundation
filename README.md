@@ -236,7 +236,7 @@ Description: (Optional) Name of the project for HCP Terraform.
 
 Type: `string`
 
-Default: `"HCP-Terraform"`
+Default: `"HCPTerraform"`
 
 ### <a name="input_hcp_foundation_project_tags"></a> [hcp\_foundation\_project\_tags](#input\_hcp\_foundation\_project\_tags)
 
