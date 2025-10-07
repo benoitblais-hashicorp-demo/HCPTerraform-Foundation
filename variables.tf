@@ -210,7 +210,7 @@ variable "teams" {
 variable "policies_factory_workspace_name" {
   description = "(Optional) Name of the workspace for the `policies factory`."
   type        = string
-  default     = "policies-factory"
+  default     = "HCPTerraform-PoliciesFactory"
 }
 
 variable "policies_factory_agent_pool_id" {

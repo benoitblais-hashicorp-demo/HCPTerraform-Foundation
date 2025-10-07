@@ -103,7 +103,7 @@ module "policies_factory_workspace" {
 module "policies_factory_team_hcp" {
   source       = "./modules/tfe_team"
   count        = length(module.policies_factory_workspace) > 0 != null ? 1 : 0
-  name         = "${module.policies_factory_workspace[0].workspace.name}-hcp"
+  name         = lower("${module.policies_factory_workspace[0].workspace.name}-hcp")
   organization = tfe_organization.this.name
   organization_access = {
     manage_policies = true
@@ -114,7 +114,7 @@ module "policies_factory_team_hcp" {
 module "policies_factory_team_git" {
   source       = "./modules/tfe_team"
   count        = length(module.policies_factory_workspace) > 0 != null ? 1 : 0
-  name         = "${module.policies_factory_workspace[0].workspace.name}-git"
+  name         = lower("${module.policies_factory_workspace[0].workspace.name}-git")
   organization = tfe_organization.this.name
   token        = true
   workspace_id = module.policies_factory_workspace[0].id
