@@ -16,7 +16,7 @@ instead of a user token.
 
 ### GitHub Permissions
 
-To manage the GitHub resources, provide a token from an account or a GitHub App with 
+To manage the GitHub resources, provide a token from an account or a GitHub App with
 appropriate permissions. It should have:
 
 * Read access to `metadata`
@@ -33,7 +33,7 @@ There are several ways to provide the required token:
 
 - Set the `token` argument in the provider configuration. You can set the token argument in the provider configuration. Use an
 input variable for the token.
-- Set the `TFE_TOKEN` environment variable. The provider can read the TFE_TOKEN environment variable and the token stored there
+- Set the `TFE_TOKEN` environment variable. The provider can read the TFE\_TOKEN environment variable and the token stored there
 to authenticate.
 
 ### GitHub Authentication
@@ -49,10 +49,10 @@ to authenticate.
 
 There are several ways to provide the required GitHub App installation:
 
-- Set the `app_auth` argument in the provider configuration. You can set the app_auth argument with the id, installation_id and pem_file
+- Set the `app_auth` argument in the provider configuration. You can set the app\_auth argument with the id, installation\_id and pem\_file
 in the provider configuration. The owner parameter is also required in this situation.
-- Set the `GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID` and `GITHUB_APP_PEM_FILE` environment variables. The provider can read the GITHUB_APP_ID,
-GITHUB_APP_INSTALLATION_ID and GITHUB_APP_PEM_FILE environment variables to authenticate.
+- Set the `GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID` and `GITHUB_APP_PEM_FILE` environment variables. The provider can read the GITHUB\_APP\_ID,
+GITHUB\_APP\_INSTALLATION\_ID and GITHUB\_APP\_PEM\_FILE environment variables to authenticate.
 
 > Because strings with new lines is not support:</br>
 > use "\\\n" within the `pem_file` argument to replace new line</br>
@@ -321,7 +321,7 @@ Description: (Optional) Name of the workspace for the `policies factory`.
 
 Type: `string`
 
-Default: `"policies-factory"`
+Default: `"HCPTerraform-PoliciesFactory"`
 
 ### <a name="input_send_passing_statuses_for_untriggered_speculative_plans"></a> [send\_passing\_statuses\_for\_untriggered\_speculative\_plans](#input\_send\_passing\_statuses\_for\_untriggered\_speculative\_plans)
 
