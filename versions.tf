@@ -11,14 +11,6 @@ terraform {
     }
   }
 
-  cloud {
-    organization = "benoitblais-hashicorp"
-
-    workspaces {
-      name = "HCPTerraform-Foundation"
-    }
-  }
-
   required_version = ">= 1.13.0"
 
 }

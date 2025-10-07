@@ -1,12 +1,12 @@
 # This workflow runs on `pull_request`.
 #
 # `Terraform` job uses `checkout` to download the content of the repository. It installs the latest version of Terraform CLI
-# It uses the GitHub Action `GitHubAction_terraform-fmt` to run `terraform fmt`. If change are made to the code, the code is push
+# It uses the GitHub Action `GitHubAction-TerraformFormat` to run `terraform fmt`. If change are made to the code, the code is push
 # to the branch.
 #
 # Documentation
 # - https://github.com/actions/checkout
-# - https://github.com/ConseilsTI/GitHubAction-TerraformFormat
+# - https://github.com/benoitblais-hashicorp-demo/GitHubAction-TerraformFormat
 #
 
 name: Terraform

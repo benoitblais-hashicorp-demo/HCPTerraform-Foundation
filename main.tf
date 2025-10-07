@@ -163,3 +163,94 @@ module "policies_factory_git_teams" {
   permission  = try(each.value.permission, null)
   repository  = module.policies_factory_repository[0].repository.name
 }
+
+# *********************************************************************************************** #
+#                                                                                                 #
+#                                        Modules Factory                                          #
+#                                                                                                 #
+# *********************************************************************************************** #
+
+# The following module block is used to create and manage the workspace used by the `modules factory`.
+
+module "modules_factory_workspace" {
+  source                        = "./modules/tfe_workspace"
+  count                         = var.modules_factory_workspace_name != null ? 1 : 0
+  name                          = var.modules_factory_workspace_name
+  agent_pool_id                 = var.modules_factory_agent_pool_id
+  auto_apply                    = true
+  auto_apply_run_trigger        = true
+  description                   = var.modules_factory_description
+  execution_mode                = var.modules_factory_execution_mode
+  organization                  = tfe_organization.this.name
+  project_id                    = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
+  structured_run_output_enabled = false
+  tags                          = merge(var.modules_factory_tag, { managed_by_terraform = true })
+  terraform_version             = "latest"
+}
+
+# The following module blocks are used to create and manage the HCP Terraform teams required by the `modules factory`.
+
+module "modules_factory_team_hcp" {
+  source       = "./modules/tfe_team"
+  count        = length(module.modules_factory_workspace) > 0 != null ? 1 : 0
+  name         = lower("${module.modules_factory_workspace[0].workspace.name}-hcp")
+  organization = tfe_organization.this.name
+  organization_access = {
+
+    manage_modules = true
+  }
+  token = true
+}
+
+module "modules_factory_team_git" {
+  source       = "./modules/tfe_team"
+  count        = length(module.modules_factory_workspace) > 0 != null ? 1 : 0
+  name         = lower("${module.modules_factory_workspace[0].workspace.name}-git")
+  organization = tfe_organization.this.name
+  token        = true
+  workspace_id = module.modules_factory_workspace[0].id
+  workspace_permission = {
+    runs = "apply"
+  }
+}
+
+# The following resource block is used to create and manage the environment variable required at the workspace level to get authenticated into HCP Terraform by the workspace.
+
+resource "tfe_variable" "modules_factory" {
+  count        = length(module.modules_factory_team_hcp) > 0 ? 1 : 0
+  key          = "TFE_TOKEN"
+  value        = module.modules_factory_team_hcp[0].token
+  category     = "env"
+  sensitive    = true
+  workspace_id = module.modules_factory_workspace[0].id
+}
+
+# The following module block is used to create and manage the GitHub repository used by the `modules factory`.
+
+module "modules_factory_repository" {
+  source      = "./modules/git_repository"
+  count       = length(module.modules_factory_workspace) > 0 != null ? 1 : 0
+  name        = module.modules_factory_workspace[0].workspace.name
+  description = module.modules_factory_workspace[0].workspace.description
+  topics      = ["foundation", "factory", "terraform-workspace", "terraform", "terraform-managed"]
+}
+
+# The following resource block is used to create and manage an action secret at the repository level for the `modules factory`.
+
+resource "github_actions_secret" "modules_factory" {
+  count           = length(module.modules_factory_repository) > 0 ? 1 : 0
+  repository      = module.modules_factory_repository[0].repository.name
+  secret_name     = "TFE_TOKEN"
+  plaintext_value = module.modules_factory_team_git[0].token
+}
+
+# The following module block is used to create and manage a GitHub team for the `modules factory`.
+
+module "modules_factory_git_teams" {
+  for_each    = { for team in var.modules_factory_github_teams : team.name => team }
+  source      = "./modules/git_team"
+  name        = each.value.name
+  description = try(each.value.description, null)
+  permission  = try(each.value.permission, null)
+  repository  = module.modules_factory_repository[0].repository.name
+}

@@ -1,6 +1,6 @@
 # This workflow runs on `pull_request`.
 #
-# `Terraform Docs`job uses `checkout` to download the content of the repository. It uses
+# `Terraform Docs` job uses `checkout` to download the content of the repository. It uses
 # GitHub Action `terraform-docs/gh-actions` to create README.md file.
 #
 # Documentation
