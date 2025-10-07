@@ -262,7 +262,7 @@ variable "policies_factory_github_teams" {
     permission  = optional(string, "pull")
   }))
   nullable = false
-  default  = [{
+  default = [{
     name        = "HCPTerraform-Policies-Contributors"
     description = "This group grant write access to the HCP Terraform Policies repository."
     permission  = "push"
@@ -326,7 +326,7 @@ variable "modules_factory_github_teams" {
     permission  = optional(string, "pull")
   }))
   nullable = false
-  default  = [{
+  default = [{
     name        = "HCPTerraform-ModulesFactory-Contributors"
     description = "This group grant write access to the HCP Terraform modules repository."
     permission  = "push"

@@ -81,15 +81,15 @@ resource "tfe_project" "hcp_foundation" {
 # The following module block is used to create and manage the workspace used by the `policies factory`.
 
 module "policies_factory_workspace" {
-  source                        = "./modules/tfe_workspace"
-  count                         = var.policies_factory_workspace_name != null ? 1 : 0
-  name                          = var.policies_factory_workspace_name
-  agent_pool_id                 = var.policies_factory_agent_pool_id
-  description                   = var.policies_factory_description
-  execution_mode                = var.policies_factory_execution_mode
-  organization                  = tfe_organization.this.name
-  project_id                    = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
-  tags                          = merge(var.policies_factory_tag, { managed_by_terraform = true })
+  source         = "./modules/tfe_workspace"
+  count          = var.policies_factory_workspace_name != null ? 1 : 0
+  name           = var.policies_factory_workspace_name
+  agent_pool_id  = var.policies_factory_agent_pool_id
+  description    = var.policies_factory_description
+  execution_mode = var.policies_factory_execution_mode
+  organization   = tfe_organization.this.name
+  project_id     = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
+  tags           = merge(var.policies_factory_tag, { managed_by_terraform = true })
 }
 
 # The following module blocks are used to create and manage the HCP Terraform teams required by the `policies factory`.
@@ -165,15 +165,15 @@ module "policies_factory_git_teams" {
 # The following module block is used to create and manage the workspace used by the `modules factory`.
 
 module "modules_factory_workspace" {
-  source                        = "./modules/tfe_workspace"
-  count                         = var.modules_factory_workspace_name != null ? 1 : 0
-  name                          = var.modules_factory_workspace_name
-  agent_pool_id                 = var.modules_factory_agent_pool_id
-  description                   = var.modules_factory_description
-  execution_mode                = var.modules_factory_execution_mode
-  organization                  = tfe_organization.this.name
-  project_id                    = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
-  tags                          = merge(var.modules_factory_tag, { managed_by_terraform = true })
+  source         = "./modules/tfe_workspace"
+  count          = var.modules_factory_workspace_name != null ? 1 : 0
+  name           = var.modules_factory_workspace_name
+  agent_pool_id  = var.modules_factory_agent_pool_id
+  description    = var.modules_factory_description
+  execution_mode = var.modules_factory_execution_mode
+  organization   = tfe_organization.this.name
+  project_id     = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
+  tags           = merge(var.modules_factory_tag, { managed_by_terraform = true })
 }
 
 # The following module blocks are used to create and manage the HCP Terraform teams required by the `modules factory`.
