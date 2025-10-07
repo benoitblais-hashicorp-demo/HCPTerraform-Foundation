@@ -82,7 +82,7 @@ variable "hcp_foundation_project_description" {
 variable "hcp_foundation_project_name" {
   description = "(Optional) Name of the project for HCP Terraform."
   type        = string
-  default     = "HCP-Terraform"
+  default     = "HCPTerraform"
 }
 
 variable "hcp_foundation_project_tags" {
