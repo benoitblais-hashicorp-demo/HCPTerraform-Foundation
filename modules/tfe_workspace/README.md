@@ -238,7 +238,7 @@ Description: (Optional) Whether this workspace should show output from Terraform
 
 Type: `bool`
 
-Default: `true`
+Default: `false`
 
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
