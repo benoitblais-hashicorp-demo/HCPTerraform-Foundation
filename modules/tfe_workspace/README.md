@@ -53,6 +53,10 @@ The following providers are used by this module:
 
 - <a name="provider_tfe"></a> [tfe](#provider\_tfe) (~>0.70)
 
+## Modules
+
+No modules.
+
 ## Resources
 
 The following resources are used by this module:
@@ -111,7 +115,7 @@ Description: (Optional) Whether to automatically apply changes when a Terraform 
 
 Type: `bool`
 
-Default: `false`
+Default: `true`
 
 ### <a name="input_auto_apply_run_trigger"></a> [auto\_apply\_run\_trigger](#input\_auto\_apply\_run\_trigger)
 
@@ -119,7 +123,7 @@ Description: (Optional) Whether to automatically apply changes for runs that wer
 
 Type: `bool`
 
-Default: `false`
+Default: `true`
 
 ### <a name="input_description"></a> [description](#input\_description)
 
@@ -250,7 +254,7 @@ Description: (Optional) The version of Terraform to use for this workspace. This
 
 Type: `string`
 
-Default: `null`
+Default: `"latest"`
 
 ### <a name="input_trigger_patterns"></a> [trigger\_patterns](#input\_trigger\_patterns)
 

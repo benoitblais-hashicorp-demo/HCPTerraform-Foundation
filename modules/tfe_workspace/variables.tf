@@ -29,13 +29,13 @@ variable "assessments_enabled" {
 variable "auto_apply" {
   description = "(Optional) Whether to automatically apply changes when a Terraform plan is successful."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "auto_apply_run_trigger" {
   description = "(Optional) Whether to automatically apply changes for runs that were created by run triggers from another workspace."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "description" {
@@ -143,7 +143,7 @@ variable "ssh_key_id" {
 variable "structured_run_output_enabled" {
   description = "(Optional) Whether this workspace should show output from Terraform runs using the enhanced UI when available. Setting this to `false` ensures that all runs in this workspace will display their output as text logs."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "tags" {
@@ -155,7 +155,7 @@ variable "tags" {
 variable "terraform_version" {
   description = "(Optional) The version of Terraform to use for this workspace. This can be either an exact version or a version constraint (like `~> 1.0.0`); if you specify a constraint, the workspace will always use the newest release that meets that constraint."
   type        = string
-  default     = null
+  default     = "latest"
 }
 
 variable "trigger_patterns" {
