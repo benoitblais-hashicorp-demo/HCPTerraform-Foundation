@@ -196,7 +196,7 @@ module "modules_factory_team_hcp" {
   name         = lower("${module.modules_factory_workspace[0].workspace.name}-hcp")
   organization = tfe_organization.this.name
   organization_access = {
-    
+
     manage_modules = true
   }
   token = true
