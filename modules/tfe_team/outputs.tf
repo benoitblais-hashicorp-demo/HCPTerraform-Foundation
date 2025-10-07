@@ -1,5 +1,5 @@
 output "team" {
-  description = "Terraform Cloud team resource."
+  description = "HCP Terraform team resource."
   value       = tfe_team.this
 }
 
