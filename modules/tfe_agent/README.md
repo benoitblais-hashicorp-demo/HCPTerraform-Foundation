@@ -1,17 +1,17 @@
-# TFC agent Terraform module
+# HCP Terraform Agent Pool Terraform module
 
-Terraform agent module which manages configuration and life-cycle 
-of all your Terraform Cloud agent configuration.
+HCP Terraform Agent Pool module which manages configuration and life-cycle 
+of your HCP Terraform Agent Pool configuration.
 
 ## Permissions
 
-To manage the agent resources, provide a user token from an account with 
-appropriate permissions. This user should belong to the `owner` team. 
-Alternatively, you can use a token from the `owners` team instead of a user token.
+To manage the agent pool resources, provide a user token from an account with 
+appropriate permissions. This user should have the `Manage agent pools` permission. 
+Alternatively, you can use a token from a team instead of a user token.
 
 ## Authentication
 
-The Terraform Cloud provider requires a Terraform Cloud/Enterprise API token in 
+The HCP Terraform provider requires a HCP Terraform/Terraform Enterprise API token in 
 order to manage resources.
 
 There are several ways to provide the required token:
@@ -41,6 +41,8 @@ module "agent" {
 
 The following requirements are needed by this module:
 
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.13.0)
+
 - <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) (~>0.70)
 
 ## Providers
@@ -48,10 +50,6 @@ The following requirements are needed by this module:
 The following providers are used by this module:
 
 - <a name="provider_tfe"></a> [tfe](#provider\_tfe) (~>0.70)
-
-## Modules
-
-No modules.
 
 ## Resources
 

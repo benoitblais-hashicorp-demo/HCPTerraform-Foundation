@@ -5,39 +5,82 @@ variable "name" {
   type        = string
 }
 
+variable "allow_auto_merge" {
+  description = "(Optional) Set to true to allow auto-merging pull requests on the repository."
+  type        = bool
+  default     = false
+}
+
+variable "allow_merge_commit" {
+  description = "(Optional) Set to false to disable merge commits on the repository."
+  type        = bool
+  default     = true
+}
+
+variable "allow_rebase_merge" {
+  description = "(Optional) Set to false to disable rebase merges on the repository."
+  type        = bool
+  default     = true
+}
+
+variable "allow_squash_merge" {
+  description = "(Optional) Set to false to disable squash merges on the repository."
+  type        = bool
+  default     = true
+}
+
+variable "allow_update_branch" {
+  description = "(Optional) Set to true to always suggest updating pull request branches."
+  type        = bool
+  default     = false
+}
+
+variable "archived" {
+  description = "(Optional) Specifies if the repository should be archived. NOTE Currently, the API does not support unarchiving."
+  type        = bool
+  default     = false
+}
+
+variable "archive_on_destroy" {
+  description = "(Optional) Set to true to archive the repository instead of deleting on destroy."
+  type        = bool
+  default     = false
+}
+
+variable "auto_init" {
+  description = "(Optional) Set to true to produce an initial commit in the repository."
+  type        = bool
+  default     = true
+}
+
+variable "delete_branch_on_merge" {
+  description = "(Optional) Automatically delete head branch after a pull request is merged."
+  type        = bool
+  default     = true
+}
+
 variable "description" {
   description = "(Optional) A description of the repository."
   type        = string
   default     = null
 }
 
-variable "homepage_url" {
-  description = "(Optional) URL of a page describing the project."
+variable "gitignore_template" {
+  description = "(Optional) Use the name of the template without the extension. For example, \"Haskell\"."
   type        = string
   default     = null
-}
-
-variable "visibility" {
-  description = "(Optional) Can be public or private. If your organization is associated with an enterprise account using GitHub Enterprise Cloud or GitHub Enterprise Server 2.20+, visibility can also be internal."
-  type        = string
-  default     = "public"
-
-  validation {
-    condition     = var.visibility != null ? contains(["public", "private", "internal"], var.visibility) ? true : false : false
-    error_message = "Valid values are \"public\", \"private\" or \"internal\"."
-  }
-}
-
-variable "has_issues" {
-  description = "(Optional) Set to true to enable the GitHub Issues features on the repository."
-  type        = bool
-  default     = true
 }
 
 variable "has_discussions" {
   description = "(Optional) Set to true to enable GitHub Discussions on the repository."
   type        = bool
   default     = false
+}
+
+variable "has_issues" {
+  description = "(Optional) Set to true to enable the GitHub Issues features on the repository."
+  type        = bool
+  default     = true
 }
 
 variable "has_projects" {
@@ -52,67 +95,28 @@ variable "has_wiki" {
   default     = true
 }
 
+variable "homepage_url" {
+  description = "(Optional) URL of a page describing the project."
+  type        = string
+  default     = null
+}
+
+variable "ignore_vulnerability_alerts_during_read" {
+  description = "(Optional) Set to true to not call the vulnerability alerts endpoint so the resource can also be used without admin permissions during read."
+  type        = bool
+  default     = false
+}
+
 variable "is_template" {
   description = "(Optional) Set to true to tell GitHub that this is a template repository."
   type        = bool
   default     = false
 }
 
-variable "allow_merge_commit" {
-  description = "(Optional) Set to false to disable merge commits on the repository."
-  type        = bool
-  default     = true
-}
-
-variable "allow_squash_merge" {
-  description = "(Optional) Set to false to disable squash merges on the repository."
-  type        = bool
-  default     = true
-}
-
-variable "allow_rebase_merge" {
-  description = "(Optional) Set to false to disable rebase merges on the repository."
-  type        = bool
-  default     = true
-}
-
-variable "allow_auto_merge" {
-  description = "(Optional) Set to true to allow auto-merging pull requests on the repository."
-  type        = bool
-  default     = false
-}
-
-variable "squash_merge_commit_title" {
-  description = "(Optional) Can be PR_TITLE or COMMIT_OR_PR_TITLE for a default squash merge commit title. Applicable only if allow_squash_merge is true."
+variable "license_template" {
+  description = "(Optional) Use the name of the template without the extension. For example, \"mit\" or \"mpl-2.0\"."
   type        = string
-  default     = "COMMIT_OR_PR_TITLE"
-
-  validation {
-    condition     = var.squash_merge_commit_title != null ? contains(["PR_TITLE", "COMMIT_OR_PR_TITLE"], var.squash_merge_commit_title) ? true : false : false
-    error_message = "Valid values are \"PR_TITLE\" or \"COMMIT_OR_PR_TITLE\"."
-  }
-}
-
-variable "squash_merge_commit_message" {
-  description = "(Optional) Can be PR_BODY, COMMIT_MESSAGES, or BLANK for a default squash merge commit message. Applicable only if allow_squash_merge is true."
-  type        = string
-  default     = "COMMIT_MESSAGES"
-
-  validation {
-    condition     = var.squash_merge_commit_message != null ? contains(["PR_BODY", "COMMIT_MESSAGES", "BLANK"], var.squash_merge_commit_message) ? true : false : false
-    error_message = "Valid values are \"PR_BODY\", \"COMMIT_MESSAGES\" or \"BLANK\"."
-  }
-}
-
-variable "merge_commit_title" {
-  description = "Can be PR_TITLE or MERGE_MESSAGE for a default merge commit title. Applicable only if allow_merge_commit is true."
-  type        = string
-  default     = "MERGE_MESSAGE"
-
-  validation {
-    condition     = var.merge_commit_title != null ? contains(["PR_TITLE", "MERGE_MESSAGE"], var.merge_commit_title) ? true : false : false
-    error_message = "Valid values are \"PR_TITLE\" or \"MERGE_MESSAGE\"."
-  }
+  default     = null
 }
 
 variable "merge_commit_message" {
@@ -126,40 +130,15 @@ variable "merge_commit_message" {
   }
 }
 
-variable "delete_branch_on_merge" {
-  description = "(Optional) Automatically delete head branch after a pull request is merged."
-  type        = bool
-  default     = true
-}
-
-variable "auto_init" {
-  description = "(Optional) Set to true to produce an initial commit in the repository."
-  type        = bool
-  default     = true
-}
-
-variable "gitignore_template" {
-  description = "(Optional) Use the name of the template without the extension. For example, \"Haskell\"."
+variable "merge_commit_title" {
+  description = "Can be PR_TITLE or MERGE_MESSAGE for a default merge commit title. Applicable only if allow_merge_commit is true."
   type        = string
-  default     = null
-}
+  default     = "MERGE_MESSAGE"
 
-variable "license_template" {
-  description = "(Optional) Use the name of the template without the extension. For example, \"mit\" or \"mpl-2.0\"."
-  type        = string
-  default     = null
-}
-
-variable "archived" {
-  description = "(Optional) Specifies if the repository should be archived. NOTE Currently, the API does not support unarchiving."
-  type        = bool
-  default     = false
-}
-
-variable "archive_on_destroy" {
-  description = "(Optional) Set to true to archive the repository instead of deleting on destroy."
-  type        = bool
-  default     = false
+  validation {
+    condition     = var.merge_commit_title != null ? contains(["PR_TITLE", "MERGE_MESSAGE"], var.merge_commit_title) ? true : false : false
+    error_message = "Valid values are \"PR_TITLE\" or \"MERGE_MESSAGE\"."
+  }
 }
 
 variable "pages" {
@@ -231,10 +210,26 @@ variable "security_and_analysis" {
   }
 }
 
-variable "topics" {
-  description = "(Optional) The list of topics of the repository."
-  type        = list(string)
-  default     = null
+variable "squash_merge_commit_message" {
+  description = "(Optional) Can be PR_BODY, COMMIT_MESSAGES, or BLANK for a default squash merge commit message. Applicable only if allow_squash_merge is true."
+  type        = string
+  default     = "COMMIT_MESSAGES"
+
+  validation {
+    condition     = var.squash_merge_commit_message != null ? contains(["PR_BODY", "COMMIT_MESSAGES", "BLANK"], var.squash_merge_commit_message) ? true : false : false
+    error_message = "Valid values are \"PR_BODY\", \"COMMIT_MESSAGES\" or \"BLANK\"."
+  }
+}
+
+variable "squash_merge_commit_title" {
+  description = "(Optional) Can be PR_TITLE or COMMIT_OR_PR_TITLE for a default squash merge commit title. Applicable only if allow_squash_merge is true."
+  type        = string
+  default     = "COMMIT_OR_PR_TITLE"
+
+  validation {
+    condition     = var.squash_merge_commit_title != null ? contains(["PR_TITLE", "COMMIT_OR_PR_TITLE"], var.squash_merge_commit_title) ? true : false : false
+    error_message = "Valid values are \"PR_TITLE\" or \"COMMIT_OR_PR_TITLE\"."
+  }
 }
 
 variable "template" {
@@ -252,22 +247,27 @@ variable "template" {
   default = null
 }
 
+variable "topics" {
+  description = "(Optional) The list of topics of the repository."
+  type        = list(string)
+  default     = null
+}
+
+variable "visibility" {
+  description = "(Optional) Can be public or private. If your organization is associated with an enterprise account using GitHub Enterprise Cloud or GitHub Enterprise Server 2.20+, visibility can also be internal."
+  type        = string
+  default     = "public"
+
+  validation {
+    condition     = var.visibility != null ? contains(["public", "private", "internal"], var.visibility) ? true : false : false
+    error_message = "Valid values are \"public\", \"private\" or \"internal\"."
+  }
+}
+
 variable "vulnerability_alerts" {
   description = "(Optional) Set to true to enable security alerts for vulnerable dependencies. Enabling requires alerts to be enabled on the owner level. (Note for importing: GitHub enables the alerts on public repos but disables them on private repos by default.) See GitHub Documentation for details. Note that vulnerability alerts have not been successfully tested on any GitHub Enterprise instance and may be unavailable in those settings."
   type        = bool
   default     = true
-}
-
-variable "ignore_vulnerability_alerts_during_read" {
-  description = "(Optional) Set to true to not call the vulnerability alerts endpoint so the resource can also be used without admin permissions during read."
-  type        = bool
-  default     = false
-}
-
-variable "allow_update_branch" {
-  description = "(Optional) Set to true to always suggest updating pull request branches."
-  type        = bool
-  default     = false
 }
 
 # The following variable is used to configure branch protection for repository. (github_branch_protection).

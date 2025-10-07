@@ -1,17 +1,17 @@
-# TFC teams Terraform module
+# HCP Terraform Teams Terraform module
 
-Terraform teams module which manages configuration and life-cycle of all
-your Terraform Cloud teams.
+HCP Terraform Teams module which manages configuration and life-cycle of
+your HCP Terraform teams.
 
 ## Permissions
 
-To manage the team resources, provide a user token from an account with 
-appropriate permissions. This user should belong to the `owners` team. 
-Alternatively, you can use a token from the owners team instead of a user token.
+To manage the agent pool resources, provide a user token from an account with 
+appropriate permissions. This user should have the `Manage organization access` permission. 
+Alternatively, you can use a token from a team instead of a user token.
 
 ## Authentication
 
-The Terraform Cloud provider requires a Terraform Cloud/Enterprise API token in 
+The HCP Terraform provider requires a HCP Terraform/Terraform Enterprise API token in 
 order to manage resources.
 
 There are several ways to provide the required token:
@@ -23,7 +23,7 @@ to authenticate.
 
 ## Features
 
-- Create and manage Terraform Cloud teams.
+- Create and manage HCP Terraform teams.
 - Manage team's organization access.
 - Manage team's members.
 - Generates a new team token and overrides existing token if one exists.
@@ -56,10 +56,6 @@ The following requirements are needed by this module:
 The following providers are used by this module:
 
 - <a name="provider_tfe"></a> [tfe](#provider\_tfe) (~>0.70)
-
-## Modules
-
-No modules.
 
 ## Resources
 
@@ -308,7 +304,7 @@ The following outputs are exported:
 
 ### <a name="output_team"></a> [team](#output\_team)
 
-Description: Terraform Cloud team resource.
+Description: HCP Terraform team resource.
 
 ### <a name="output_team_id"></a> [team\_id](#output\_team\_id)
 

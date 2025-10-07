@@ -1,7 +1,7 @@
 # GitHub repository Terraform module
 
 GitHub repository module which manages configuration and life-cycle 
-of all your GitHub repository configuration.
+of your GitHub repository configuration.
 
 ## Permissions
 
@@ -67,24 +67,20 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.13.0)
 
-- <a name="requirement_github"></a> [github](#requirement\_github) (6.6.0)
+- <a name="requirement_github"></a> [github](#requirement\_github) (~>6.6)
 
 ## Providers
 
 The following providers are used by this module:
 
-- <a name="provider_github"></a> [github](#provider\_github) (6.6.0)
-
-## Modules
-
-No modules.
+- <a name="provider_github"></a> [github](#provider\_github) (~>6.6)
 
 ## Resources
 
 The following resources are used by this module:
 
-- [github_branch_protection.this](https://registry.terraform.io/providers/integrations/github/6.6.0/docs/resources/branch_protection) (resource)
-- [github_repository.this](https://registry.terraform.io/providers/integrations/github/6.6.0/docs/resources/repository) (resource)
+- [github_branch_protection.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/branch_protection) (resource)
+- [github_repository.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository) (resource)
 
 ## Required Inputs
 
