@@ -13,6 +13,7 @@ variable "organization_name" {
 variable "agent_pools" {
   description = "(Optional) A list with the name of all the agent pools available at the organization level."
   type        = list(string)
+  nullable    = false
   default     = []
 }
 
@@ -42,6 +43,7 @@ variable "assessments_enforced" {
 variable "collaborator_auth_policy" {
   description = "(Optional) Authentication policy. Valid values are `password` or `two_factor_mandatory`. Default to `two_factor_mandatory`."
   type        = string
+  nullable    = false
   default     = "two_factor_mandatory"
 
   validation {
@@ -56,15 +58,17 @@ variable "cost_estimation_enabled" {
   default     = true
 }
 
-variable "default_agent_pool_id" {
-  description = "(Optional) The ID of an agent pool to assign to the workspace. Requires `default_execution_mode` to be set to `agent`. This value must not be provided if `default_execution_mode` is set to any other value."
-  type        = string
-  default     = null
-}
+# variable "default_agent_pool_id" {
+#   description = "(Optional) The ID of an agent pool to assign to the workspace. Requires `default_execution_mode` to be set to `agent`. This value must not be provided if `default_execution_mode` is set to any other value."
+#   type        = string
+#   nullable    = true
+#   default     = null
+# }
 
 variable "default_execution_mode" {
   description = " (Optional) Which execution mode to use as the default for all workspaces in the organization. Valid values are `remote`, `local` or `agent`. Default to `remote`."
   type        = string
+  nullable    = false
   default     = "remote"
 
   validation {
@@ -76,24 +80,28 @@ variable "default_execution_mode" {
 variable "hcp_foundation_project_description" {
   description = "(Optional) A description for the project for HCP Terraform."
   type        = string
+  nullable    = true
   default     = null
 }
 
 variable "hcp_foundation_project_name" {
   description = "(Optional) Name of the project for HCP Terraform."
   type        = string
+  nullable    = true
   default     = "HCPTerraform"
 }
 
 variable "hcp_foundation_project_tags" {
   description = "(Optional) Name of the project for HCP Terraform."
   type        = map(string)
+  nullable    = true
   default     = null
 }
 
 variable "owners_team_saml_role_id" {
   description = "(Optional) The name of the \"owners\" team."
   type        = string
+  nullable    = true
   default     = null
 }
 
@@ -106,6 +114,7 @@ variable "send_passing_statuses_for_untriggered_speculative_plans" {
 variable "session_remember_minutes" {
   description = "(Optional) Session expiration. Defaults to `20160`."
   type        = number
+  nullable    = true
   default     = null
 }
 
@@ -113,6 +122,7 @@ variable "session_remember_minutes" {
 variable "session_timeout_minutes" {
   description = "(Optional) Session timeout after inactivity. Defaults to `20160`."
   type        = number
+  nullable    = true
   default     = null
 }
 
@@ -175,7 +185,8 @@ variable "teams" {
     token_force_regenerate = optional(bool, false)
     visibility             = optional(string, "organization")
   }))
-  default = []
+  nullable = false
+  default  = []
 
   validation {
     condition     = length([for team in var.teams : team.organization_access != null ? team.organization_access.read_projects != false && team.organization_access.manage_projects != false ? false : true : true]) == length(var.teams)
@@ -202,32 +213,34 @@ variable "teams" {
 }
 
 # *********************************************************************************************** #
-#                                                                                                 #
 #                                       Policies Factory                                          #
-#                                                                                                 #
 # *********************************************************************************************** #
 
 variable "policies_factory_workspace_name" {
   description = "(Optional) Name of the workspace for the `policies factory`."
   type        = string
+  nullable    = true
   default     = "HCPTerraform-PoliciesFactory"
 }
 
 variable "policies_factory_agent_pool_id" {
   description = "(Optional) The ID of an agent pool to assign to the workspace for the `policies factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value."
   type        = string
+  nullable    = true
   default     = null
 }
 
 variable "policies_factory_description" {
   description = "(Optional) A description for the workspacel for the `policies factory`."
   type        = string
+  nullable    = true
   default     = "Code to provision and manage HCP Terraform policies using Terraform code (IaC)."
 }
 
 variable "policies_factory_execution_mode" {
   description = "(Optional) Which execution mode to use for the `policies factory`. Using Terraform Cloud, valid values are `remote`, `local` or `agent`. When set to `local`, the workspace will be used for state storage only. Important: If you omit this attribute, the resource configures the workspace to use your organization's default execution mode (which in turn defaults to `remote`), removing any explicit value that might have previously been set for the workspace."
   type        = string
+  nullable    = true
   default     = null
 
   validation {
@@ -248,6 +261,7 @@ variable "policies_factory_github_teams" {
     description = optional(string)
     permission  = optional(string, "pull")
   }))
+  nullable = false
   default = [{
     name        = "HCPTerraform-Policies-Contributors"
     description = "This group grant write access to the HCP Terraform Policies repository."
@@ -258,36 +272,39 @@ variable "policies_factory_github_teams" {
 variable "policies_factory_tag" {
   description = "(Optional) A map of key value tags for this workspace for the `policies factory`."
   type        = map(string)
+  nullable    = true
   default     = null
 }
 
 # *********************************************************************************************** #
-#                                                                                                 #
 #                                       Modules Factory                                          #
-#                                                                                                 #
 # *********************************************************************************************** #
 
 variable "modules_factory_workspace_name" {
   description = "(Optional) Name of the workspace for the `modules factory`."
   type        = string
+  nullable    = true
   default     = "HCPTerraform-ModulesFactory"
 }
 
 variable "modules_factory_agent_pool_id" {
   description = "(Optional) The ID of an agent pool to assign to the workspace for the `modules factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value."
   type        = string
+  nullable    = true
   default     = null
 }
 
 variable "modules_factory_description" {
   description = "(Optional) A description for the workspacel for the `modules factory`."
   type        = string
+  nullable    = true
   default     = "Code to provision and manage HCP Terraform modules using Terraform code (IaC)."
 }
 
 variable "modules_factory_execution_mode" {
   description = "(Optional) Which execution mode to use for the `modules factory`. Using Terraform Cloud, valid values are `remote`, `local` or `agent`. When set to `local`, the workspace will be used for state storage only. Important: If you omit this attribute, the resource configures the workspace to use your organization's default execution mode (which in turn defaults to `remote`), removing any explicit value that might have previously been set for the workspace."
   type        = string
+  nullable    = true
   default     = null
 
   validation {
@@ -308,6 +325,7 @@ variable "modules_factory_github_teams" {
     description = optional(string)
     permission  = optional(string, "pull")
   }))
+  nullable = false
   default = [{
     name        = "HCPTerraform-ModulesFactory-Contributors"
     description = "This group grant write access to the HCP Terraform modules repository."
@@ -318,5 +336,6 @@ variable "modules_factory_github_teams" {
 variable "modules_factory_tag" {
   description = "(Optional) A map of key value tags for this workspace for the `modules factory`."
   type        = map(string)
+  nullable    = true
   default     = null
 }

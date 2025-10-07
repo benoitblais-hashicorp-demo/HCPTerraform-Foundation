@@ -29,12 +29,12 @@ resource "tfe_organization_default_settings" "this" {
   default_execution_mode = var.default_execution_mode
   organization           = tfe_organization.this.name
 
-  lifecycle {
-    precondition {
-      condition     = var.default_agent_pool_id != null ? var.default_execution_mode == "agent" ? true : false : true
-      error_message = "Requires `default_execution_mode` to be set to agent if `default_agent_pool_id` is set."
-    }
-  }
+  # lifecycle {
+  #   precondition {
+  #     condition     = var.default_agent_pool_id != null ? var.default_execution_mode == "agent" ? true : false : true
+  #     error_message = "Requires `default_execution_mode` to be set to \"agent\" if `default_agent_pool_id` is set."
+  #   }
+  # }
 }
 
 # The following code block is use to create and manage agent pools avaiable at the organization level.
@@ -75,27 +75,21 @@ resource "tfe_project" "hcp_foundation" {
 }
 
 # *********************************************************************************************** #
-#                                                                                                 #
 #                                       Policies Factory                                          #
-#                                                                                                 #
 # *********************************************************************************************** #
 
 # The following module block is used to create and manage the workspace used by the `policies factory`.
 
 module "policies_factory_workspace" {
-  source                        = "./modules/tfe_workspace"
-  count                         = var.policies_factory_workspace_name != null ? 1 : 0
-  name                          = var.policies_factory_workspace_name
-  agent_pool_id                 = var.policies_factory_agent_pool_id
-  auto_apply                    = true
-  auto_apply_run_trigger        = true
-  description                   = var.policies_factory_description
-  execution_mode                = var.policies_factory_execution_mode
-  organization                  = tfe_organization.this.name
-  project_id                    = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
-  structured_run_output_enabled = false
-  tags                          = merge(var.policies_factory_tag, { managed_by_terraform = true })
-  terraform_version             = "latest"
+  source         = "./modules/tfe_workspace"
+  count          = var.policies_factory_workspace_name != null ? 1 : 0
+  name           = var.policies_factory_workspace_name
+  agent_pool_id  = var.policies_factory_agent_pool_id
+  description    = var.policies_factory_description
+  execution_mode = var.policies_factory_execution_mode
+  organization   = tfe_organization.this.name
+  project_id     = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
+  tags           = merge(var.policies_factory_tag, { managed_by_terraform = true })
 }
 
 # The following module blocks are used to create and manage the HCP Terraform teams required by the `policies factory`.
@@ -165,27 +159,21 @@ module "policies_factory_git_teams" {
 }
 
 # *********************************************************************************************** #
-#                                                                                                 #
 #                                        Modules Factory                                          #
-#                                                                                                 #
 # *********************************************************************************************** #
 
 # The following module block is used to create and manage the workspace used by the `modules factory`.
 
 module "modules_factory_workspace" {
-  source                        = "./modules/tfe_workspace"
-  count                         = var.modules_factory_workspace_name != null ? 1 : 0
-  name                          = var.modules_factory_workspace_name
-  agent_pool_id                 = var.modules_factory_agent_pool_id
-  auto_apply                    = true
-  auto_apply_run_trigger        = true
-  description                   = var.modules_factory_description
-  execution_mode                = var.modules_factory_execution_mode
-  organization                  = tfe_organization.this.name
-  project_id                    = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
-  structured_run_output_enabled = false
-  tags                          = merge(var.modules_factory_tag, { managed_by_terraform = true })
-  terraform_version             = "latest"
+  source         = "./modules/tfe_workspace"
+  count          = var.modules_factory_workspace_name != null ? 1 : 0
+  name           = var.modules_factory_workspace_name
+  agent_pool_id  = var.modules_factory_agent_pool_id
+  description    = var.modules_factory_description
+  execution_mode = var.modules_factory_execution_mode
+  organization   = tfe_organization.this.name
+  project_id     = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
+  tags           = merge(var.modules_factory_tag, { managed_by_terraform = true })
 }
 
 # The following module blocks are used to create and manage the HCP Terraform teams required by the `modules factory`.
@@ -196,8 +184,9 @@ module "modules_factory_team_hcp" {
   name         = lower("${module.modules_factory_workspace[0].workspace.name}-hcp")
   organization = tfe_organization.this.name
   organization_access = {
-
-    manage_modules = true
+    manage_modules    = true
+    manage_projects   = true
+    manage_workspaces = true
   }
   token = true
 }
