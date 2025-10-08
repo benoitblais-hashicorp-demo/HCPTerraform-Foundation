@@ -258,11 +258,11 @@ Description: (Optional) Name of the project for HCP Terraform.
 
 Type: `string`
 
-Default: `"HCPTerraform"`
+Default: `"HCP Terraform"`
 
 ### <a name="input_hcp_foundation_project_tags"></a> [hcp\_foundation\_project\_tags](#input\_hcp\_foundation\_project\_tags)
 
-Description: (Optional) Name of the project for HCP Terraform.
+Description: (Optional) A map of key-value tags to add to the project for HCP Terraform.
 
 Type: `map(string)`
 

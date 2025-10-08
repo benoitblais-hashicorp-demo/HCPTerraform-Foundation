@@ -97,7 +97,7 @@ module "policies_factory_workspace" {
 module "policies_factory_team_hcp" {
   source       = "./modules/tfe_team"
   count        = length(module.policies_factory_workspace) > 0 != null ? 1 : 0
-  name         = lower("${module.policies_factory_workspace[0].workspace.name}-hcp")
+  name         = lower(replace("${module.policies_factory_workspace[0].workspace.name}-hcp", "/\\W|_|\\s/", "-"))
   organization = tfe_organization.this.name
   organization_access = {
     manage_policies = true
@@ -108,7 +108,7 @@ module "policies_factory_team_hcp" {
 module "policies_factory_team_git" {
   source       = "./modules/tfe_team"
   count        = length(module.policies_factory_workspace) > 0 != null ? 1 : 0
-  name         = lower("${module.policies_factory_workspace[0].workspace.name}-git")
+  name         = lower(replace("${module.policies_factory_workspace[0].workspace.name}-git", "/\\W|_|\\s/", "-"))
   organization = tfe_organization.this.name
   token        = true
   workspace_id = module.policies_factory_workspace[0].id
@@ -181,12 +181,14 @@ module "modules_factory_workspace" {
 module "modules_factory_team_hcp" {
   source       = "./modules/tfe_team"
   count        = length(module.modules_factory_workspace) > 0 != null ? 1 : 0
-  name         = lower("${module.modules_factory_workspace[0].workspace.name}-hcp")
+  name         = lower(replace("${module.modules_factory_workspace[0].workspace.name}-hcp", "/\\W|_|\\s/", "-"))
   organization = tfe_organization.this.name
   organization_access = {
-    manage_modules    = true
-    manage_projects   = true
-    manage_workspaces = true
+    manage_modules             = true
+    manage_organization_access = true
+    manage_projects            = true
+    manage_teams               = true
+    manage_workspaces          = true
   }
   token = true
 }
@@ -194,7 +196,7 @@ module "modules_factory_team_hcp" {
 module "modules_factory_team_git" {
   source       = "./modules/tfe_team"
   count        = length(module.modules_factory_workspace) > 0 != null ? 1 : 0
-  name         = lower("${module.modules_factory_workspace[0].workspace.name}-git")
+  name         = lower(replace("${module.modules_factory_workspace[0].workspace.name}-git", "/\\W|_|\\s/", "-"))
   organization = tfe_organization.this.name
   token        = true
   workspace_id = module.modules_factory_workspace[0].id
