@@ -108,7 +108,7 @@ module "policies_factory_team_hcp" {
 module "policies_factory_team_git" {
   source       = "./modules/tfe_team"
   count        = length(module.policies_factory_workspace) > 0 != null ? 1 : 0
-  name         = lower(replace("${module.policies_factory_workspace[0].workspace.name}-hcp", "/\\W|_|\\s/", "-"))
+  name         = lower(replace("${module.policies_factory_workspace[0].workspace.name}-git", "/\\W|_|\\s/", "-"))
   organization = tfe_organization.this.name
   token        = true
   workspace_id = module.policies_factory_workspace[0].id
