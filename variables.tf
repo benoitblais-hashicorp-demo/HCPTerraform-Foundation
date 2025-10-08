@@ -88,11 +88,11 @@ variable "hcp_foundation_project_name" {
   description = "(Optional) Name of the project for HCP Terraform."
   type        = string
   nullable    = true
-  default     = "HCPTerraform"
+  default     = "HCP Terraform"
 }
 
 variable "hcp_foundation_project_tags" {
-  description = "(Optional) Name of the project for HCP Terraform."
+  description = "(Optional) A map of key-value tags to add to the project for HCP Terraform."
   type        = map(string)
   nullable    = true
   default     = null
