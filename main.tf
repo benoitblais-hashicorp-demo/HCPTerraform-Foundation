@@ -135,7 +135,7 @@ module "policies_factory_repository" {
   count       = length(module.policies_factory_workspace) > 0 != null ? 1 : 0
   name        = module.policies_factory_workspace[0].workspace.name
   description = module.policies_factory_workspace[0].workspace.description
-  topics      = ["foundation", "factory", "terraform-workspace", "terraform", "terraform-managed"]
+  topics      = ["factory", "terraform-workspace", "terraform", "terraform-managed"]
 }
 
 # The following resource block is used to create and manage an action secret at the repository level for the `policies factory`.
@@ -199,6 +199,10 @@ module "modules_factory_team_git" {
   count        = length(module.modules_factory_workspace) > 0 != null ? 1 : 0
   name         = lower(replace("${module.modules_factory_workspace[0].workspace.name}-git", "/\\W|_|\\s/", "-"))
   organization = tfe_organization.this.name
+  organization_access = {
+    manage_projects   = true # This is required to be able to create workspace from no-code module through GitHub Actions.
+    manage_workspaces = true # This is required to be able to create workspace from no-code module through GitHub Actions.
+  }
   token        = true
   workspace_id = module.modules_factory_workspace[0].id
   workspace_permission = {
@@ -224,7 +228,7 @@ module "modules_factory_repository" {
   count       = length(module.modules_factory_workspace) > 0 != null ? 1 : 0
   name        = module.modules_factory_workspace[0].workspace.name
   description = module.modules_factory_workspace[0].workspace.description
-  topics      = ["foundation", "factory", "terraform-workspace", "terraform", "terraform-managed"]
+  topics      = ["factory", "terraform-workspace", "terraform", "terraform-managed"]
 }
 
 # The following resource block is used to create and manage an action secret at the repository level for the `modules factory`.
