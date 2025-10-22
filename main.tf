@@ -221,6 +221,18 @@ resource "tfe_variable" "modules_factory" {
   workspace_id = module.modules_factory_workspace[0].id
 }
 
+# The following resource block is used to create and manage the terraform variable required at the workspace level.
+
+resource "tfe_variable" "modules_factory_organization_name" {
+  count        = length(module.modules_factory_team_hcp) > 0 ? 1 : 0
+  key          = "organization_name"
+  value        = var.organization_name
+  category     = "terraform"
+  description  = "(Required) Name of the organization."
+  sensitive    = false
+  workspace_id = module.modules_factory_workspace[0].id
+}
+
 # The following module block is used to create and manage the GitHub repository used by the `modules factory`.
 
 module "modules_factory_repository" {
