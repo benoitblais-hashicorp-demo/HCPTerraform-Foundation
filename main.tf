@@ -200,8 +200,8 @@ module "modules_factory_team_git" {
   name         = lower(replace("${module.modules_factory_workspace[0].workspace.name}-git", "/\\W|_|\\s/", "-"))
   organization = tfe_organization.this.name
   organization_access = {
-    manage_projects            = true   # This is required to be able to create workspace from no-code module through GitHub Actions.
-    manage_workspaces          = true   # This is required to be able to create workspace from no-code module through GitHub Actions.
+    manage_projects   = true # This is required to be able to create workspace from no-code module through GitHub Actions.
+    manage_workspaces = true # This is required to be able to create workspace from no-code module through GitHub Actions.
   }
   token        = true
   workspace_id = module.modules_factory_workspace[0].id
