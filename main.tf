@@ -49,9 +49,25 @@ module "agent_pool" {
 
 # The following code block is use to create and manage team at the organization level.
 
+locals {
+  teams = var.enable_waypoint ? concat(var.teams, [
+    {
+      name = "waypoint"
+      organization_access = {
+        manage_membership          = true
+        manage_organization_access = true
+        manage_projects            = true
+        manage_teams               = true
+        manage_workspaces          = true
+      }
+      token = true
+    }
+  ]) : var.teams
+}
+
 module "teams" {
   source                 = "./modules/tfe_team"
-  for_each               = nonsensitive({ for team in var.teams : team.name => team })
+  for_each               = nonsensitive({ for team in local.teams : team.name => team })
   name                   = each.value.name
   organization           = tfe_organization.this.name
   organization_access    = try(each.value.organization_access, null)
@@ -72,6 +88,16 @@ resource "tfe_project" "hcp_foundation" {
   tags = merge(var.hcp_foundation_project_tags, {
     managed_by_terraform = "true"
   })
+}
+
+# *********************************************************************************************** #
+#                                         HCP Waypoint                                            #
+# *********************************************************************************************** #
+
+resource "hcp_waypoint_tfc_config" "test" {
+  count        = var.enable_waypoint ? 1 : 0
+  token        = module.teams[ "waypoint" ].token
+  tfc_org_name = tfe_organization.this.name
 }
 
 # *********************************************************************************************** #

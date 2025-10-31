@@ -77,6 +77,12 @@ variable "default_execution_mode" {
   }
 }
 
+variable "enable_waypoint" {
+  description = "(Optional) Whether or not to enable HCP Waypoint for the organization. Defaults to `false`."
+  type        = bool
+  default     = false
+}
+
 variable "hcp_foundation_project_description" {
   description = "(Optional) A description for the project for HCP Terraform."
   type        = string
