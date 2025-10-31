@@ -623,7 +623,11 @@ The following resources are used by this module:
 
 ## Outputs
 
-No outputs.
+The following outputs are exported:
+
+### <a name="output_teams"></a> [teams](#output\_teams)
+
+Description: List of Teams created
 
 <!-- markdownlint-enable -->
 <!-- END_TF_DOCS -->
