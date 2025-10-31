@@ -78,6 +78,14 @@ module "teams" {
   visibility             = try(each.value.visibility, "organization")
 }
 
+# The following block is use to get information about an OAuth client.
+
+data "tfe_oauth_client" "client" {
+  count        = var.oauth_client_name != null ? 1 : 0
+  organization = var.organization_name
+  name         = var.oauth_client_name
+}
+
 # The following code block is use to create and manage the project where all the workspaces related to the foundation will be stored.
 
 resource "tfe_project" "hcp_foundation" {
@@ -93,6 +101,35 @@ resource "tfe_project" "hcp_foundation" {
 # *********************************************************************************************** #
 #                                         HCP Waypoint                                            #
 # *********************************************************************************************** #
+
+# The following module block is used to create and manage the GitHub repository used by the `waypoint`.
+
+module "waypoint_repository" {
+  source      = "./modules/git_repository"
+  count       = var.waypoint_workspace_name != null ? 1 : 0
+  name        = var.waypoint_workspace_name
+  description = var.waypoint_description
+  topics      = ["terraform-workspace", "terraform", "terraform-managed"]
+}
+
+
+
+module "waypoint_workspace" {
+  source         = "./modules/tfe_workspace"
+  count          = length(var.waypoint_workspace_name) > 0 ? 1 : 0
+  name           = lower(var.waypoint_workspace_name)
+  agent_pool_id  = var.waypoint_agent_pool_id
+  description    = var.waypoint_description
+  execution_mode = var.waypoint_execution_mode
+  organization   = tfe_organization.this.name
+  project_id     = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
+  tags           = merge(var.policies_factory_tag, { managed_by_terraform = true })
+  vcs_repo       = {
+    identifier     = module.waypoint_repository[0].repository.full_name
+    oauth_token_id = data.tfe_oauth_client.client[0].oauth_token_id
+  }
+}
+
 
 
 # *********************************************************************************************** #
