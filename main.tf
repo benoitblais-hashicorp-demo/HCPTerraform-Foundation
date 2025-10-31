@@ -124,7 +124,7 @@ module "waypoint_workspace" {
   organization   = tfe_organization.this.name
   project_id     = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
   tags           = merge(var.policies_factory_tag, { managed_by_terraform = true })
-  vcs_repo       = {
+  vcs_repo = {
     identifier     = module.waypoint_repository[0].repository.full_name
     oauth_token_id = data.tfe_oauth_client.client[0].oauth_token_id
   }
