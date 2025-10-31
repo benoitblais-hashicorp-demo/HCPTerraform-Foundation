@@ -94,11 +94,7 @@ resource "tfe_project" "hcp_foundation" {
 #                                         HCP Waypoint                                            #
 # *********************************************************************************************** #
 
-resource "hcp_waypoint_tfc_config" "test" {
-  count        = var.enable_waypoint ? 1 : 0
-  token        = module.teams[ "waypoint" ].token
-  tfc_org_name = tfe_organization.this.name
-}
+
 
 # *********************************************************************************************** #
 #                                       Policies Factory                                          #

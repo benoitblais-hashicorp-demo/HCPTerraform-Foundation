@@ -78,27 +78,27 @@ variable "default_execution_mode" {
 }
 
 variable "enable_waypoint" {
-  description = "(Optional) Whether or not to enable HCP Waypoint for the organization. Defaults to `false`."
+  description = "(Optional) Whether or not to enable HCP Waypoint in the organization. Defaults to `false`."
   type        = bool
   default     = false
 }
 
 variable "hcp_foundation_project_description" {
-  description = "(Optional) A description for the project for HCP Terraform."
+  description = "(Optional) A description for the project in HCP Terraform."
   type        = string
   nullable    = true
   default     = null
 }
 
 variable "hcp_foundation_project_name" {
-  description = "(Optional) Name of the project for HCP Terraform."
+  description = "(Optional) Name of the project in HCP Terraform."
   type        = string
   nullable    = true
-  default     = "HCP Terraform"
+  default     = "HCP Foundation"
 }
 
 variable "hcp_foundation_project_tags" {
-  description = "(Optional) A map of key-value tags to add to the project for HCP Terraform."
+  description = "(Optional) A map of key-value tags to add to the project in HCP Terraform."
   type        = map(string)
   nullable    = true
   default     = null
