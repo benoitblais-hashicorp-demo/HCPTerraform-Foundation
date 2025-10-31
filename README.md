@@ -88,7 +88,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.13.0)
 
-- <a name="requirement_github"></a> [github](#requirement\_github) (~>6.6)
+- <a name="requirement_github"></a> [github](#requirement\_github) (~>6.6.0)
 
 - <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) (~>0.70)
 
@@ -157,6 +157,36 @@ Source: ./modules/tfe_team
 Version:
 
 ### <a name="module_policies_factory_workspace"></a> [policies\_factory\_workspace](#module\_policies\_factory\_workspace)
+
+Source: ./modules/tfe_workspace
+
+Version:
+
+### <a name="module_projects_factory_git_teams"></a> [projects\_factory\_git\_teams](#module\_projects\_factory\_git\_teams)
+
+Source: ./modules/git_team
+
+Version:
+
+### <a name="module_projects_factory_repository"></a> [projects\_factory\_repository](#module\_projects\_factory\_repository)
+
+Source: ./modules/git_repository
+
+Version:
+
+### <a name="module_projects_factory_team_git"></a> [projects\_factory\_team\_git](#module\_projects\_factory\_team\_git)
+
+Source: ./modules/tfe_team
+
+Version:
+
+### <a name="module_projects_factory_team_hcp"></a> [projects\_factory\_team\_hcp](#module\_projects\_factory\_team\_hcp)
+
+Source: ./modules/tfe_team
+
+Version:
+
+### <a name="module_projects_factory_workspace"></a> [projects\_factory\_workspace](#module\_projects\_factory\_workspace)
 
 Source: ./modules/tfe_workspace
 
@@ -414,6 +444,75 @@ Type: `string`
 
 Default: `"HCPTerraform-PoliciesFactory"`
 
+### <a name="input_projects_factory_agent_pool_id"></a> [projects\_factory\_agent\_pool\_id](#input\_projects\_factory\_agent\_pool\_id)
+
+Description: (Optional) The ID of an agent pool to assign to the workspace for the `projects factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_projects_factory_description"></a> [projects\_factory\_description](#input\_projects\_factory\_description)
+
+Description: (Optional) A description for the workspace for the `projects factory`.
+
+Type: `string`
+
+Default: `"Code to provision and manage HCP Terraform projects using Terraform code (IaC)."`
+
+### <a name="input_projects_factory_execution_mode"></a> [projects\_factory\_execution\_mode](#input\_projects\_factory\_execution\_mode)
+
+Description: (Optional) Which execution mode to use for the `projects factory`. Using Terraform Cloud, valid values are `remote`, `local` or `agent`. When set to `local`, the workspace will be used for state storage only. Important: If you omit this attribute, the resource configures the workspace to use your organization's default execution mode (which in turn defaults to `remote`), removing any explicit value that might have previously been set for the workspace.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_projects_factory_github_teams"></a> [projects\_factory\_github\_teams](#input\_projects\_factory\_github\_teams)
+
+Description:   (Optional) The projects\_factory\_github\_teams block supports the following:  
+    name        : (Required) The name of the team.  
+    description : (Optional) A description of the team.  
+    permission  : (Optional) The permissions of team members regarding the repository. Must be one of `pull`, `triage`, `push`, `maintain`, `admin` or the name of an existing custom repository role within the organisation.
+
+Type:
+
+```hcl
+list(object({
+    name        = string
+    description = optional(string)
+    permission  = optional(string, "pull")
+  }))
+```
+
+Default:
+
+```json
+[
+  {
+    "description": "This group grant write access to the HCP Terraform projects repository.",
+    "name": "HCPTerraform-ProjectsFactory-Contributors",
+    "permission": "push"
+  }
+]
+```
+
+### <a name="input_projects_factory_tag"></a> [projects\_factory\_tag](#input\_projects\_factory\_tag)
+
+Description: (Optional) A map of key value tags for this workspace for the `projects factory`.
+
+Type: `map(string)`
+
+Default: `null`
+
+### <a name="input_projects_factory_workspace_name"></a> [projects\_factory\_workspace\_name](#input\_projects\_factory\_workspace\_name)
+
+Description: (Optional) Name of the workspace for the `projects factory`.
+
+Type: `string`
+
+Default: `"HCPTerraform-ProjectsFactory"`
+
 ### <a name="input_send_passing_statuses_for_untriggered_speculative_plans"></a> [send\_passing\_statuses\_for\_untriggered\_speculative\_plans](#input\_send\_passing\_statuses\_for\_untriggered\_speculative\_plans)
 
 Description: (Optional) Whether or not to send VCS status updates for untriggered speculative plans. This can be useful if large numbers of untriggered workspaces are exhausting request limits for connected version control service providers like GitHub. Defaults to `false`.
@@ -512,11 +611,15 @@ The following resources are used by this module:
 
 - [github_actions_secret.modules_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
 - [github_actions_secret.policies_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
+- [github_actions_secret.projects_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
 - [tfe_organization.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/organization) (resource)
 - [tfe_organization_default_settings.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/organization_default_settings) (resource)
 - [tfe_project.hcp_foundation](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/project) (resource)
 - [tfe_variable.modules_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+- [tfe_variable.modules_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.policies_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+- [tfe_variable.projects_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+- [tfe_variable.projects_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 
 ## Outputs
 
