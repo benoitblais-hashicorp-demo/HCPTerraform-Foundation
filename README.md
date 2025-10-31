@@ -276,11 +276,11 @@ Default: `"remote"`
 
 ### <a name="input_enable_waypoint"></a> [enable\_waypoint](#input\_enable\_waypoint)
 
-Description: (Optional) Whether or not to enable HCP Waypoint in the organization. Defaults to `false`.
+Description: (Optional) Whether or not to enable HCP Waypoint in the organization. Defaults to `true`.
 
 Type: `bool`
 
-Default: `false`
+Default: `true`
 
 ### <a name="input_hcp_foundation_project_description"></a> [hcp\_foundation\_project\_description](#input\_hcp\_foundation\_project\_description)
 
