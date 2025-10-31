@@ -78,24 +78,31 @@ variable "default_execution_mode" {
 }
 
 variable "hcp_foundation_project_description" {
-  description = "(Optional) A description for the project for HCP Terraform."
+  description = "(Optional) A description for the project in HCP Terraform."
   type        = string
   nullable    = true
   default     = null
 }
 
 variable "hcp_foundation_project_name" {
-  description = "(Optional) Name of the project for HCP Terraform."
+  description = "(Optional) Name of the project in HCP Terraform."
   type        = string
   nullable    = true
-  default     = "HCP Terraform"
+  default     = "HCP Foundation"
 }
 
 variable "hcp_foundation_project_tags" {
-  description = "(Optional) A map of key-value tags to add to the project for HCP Terraform."
+  description = "(Optional) A map of key-value tags to add to the project in HCP Terraform."
   type        = map(string)
   nullable    = true
   default     = null
+}
+
+variable "oauth_client_name" {
+  description = "(Optional) Name of the OAuth client."
+  type        = string
+  nullable    = false
+  default     = "GitHub"
 }
 
 variable "owners_team_saml_role_id" {
@@ -117,7 +124,6 @@ variable "session_remember_minutes" {
   nullable    = true
   default     = null
 }
-
 
 variable "session_timeout_minutes" {
   description = "(Optional) Session timeout after inactivity. Defaults to `20160`."
@@ -210,6 +216,50 @@ variable "teams" {
     condition     = length([for team in var.teams : contains(["secret", "organization"], team.visibility)]) == length(var.teams)
     error_message = "Valid values for `visibility` is \"secret\" or \"organization\"."
   }
+}
+
+# *********************************************************************************************** #
+#                                         HCP Waypoint                                            #
+# *********************************************************************************************** #
+
+variable "waypoint_workspace_name" {
+  description = "(Optional) Name of the workspace for `waypoint`."
+  type        = string
+  nullable    = true
+  default     = "HCPTerraform-Waypoint"
+}
+
+variable "waypoint_agent_pool_id" {
+  description = "(Optional) The ID of an agent pool to assign to the workspace for `waypoint`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value."
+  type        = string
+  nullable    = true
+  default     = null
+}
+
+variable "waypoint_description" {
+  description = "(Optional) A description for the workspacel for `waypoint`."
+  type        = string
+  nullable    = true
+  default     = "Code to provision and manage HCP Waypoint using Terraform code (IaC)."
+}
+
+variable "waypoint_execution_mode" {
+  description = "(Optional) Which execution mode to use for the `policies factory`. Using Terraform Cloud, valid values are `remote`, `local` or `agent`. When set to `local`, the workspace will be used for state storage only. Important: If you omit this attribute, the resource configures the workspace to use your organization's default execution mode (which in turn defaults to `remote`), removing any explicit value that might have previously been set for the workspace."
+  type        = string
+  nullable    = true
+  default     = null
+
+  validation {
+    condition     = var.waypoint_execution_mode != null ? contains(["null", "remote", "local", "agent"], var.waypoint_execution_mode) ? true : false : true
+    error_message = "Valid values are \"remote\", \"local\" or \"agent\"."
+  }
+}
+
+variable "waypoint_team_name" {
+  description = "(Optional) Name of the team for `waypoint`."
+  type        = string
+  nullable    = false
+  default     = "HCPTerraform-Waypoint-Admins"
 }
 
 # *********************************************************************************************** #
