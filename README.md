@@ -90,8 +90,6 @@ The following requirements are needed by this module:
 
 - <a name="requirement_github"></a> [github](#requirement\_github) (~>6.6.0)
 
-- <a name="requirement_hcp"></a> [hcp](#requirement\_hcp) (0.110.0)
-
 - <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) (~>0.70)
 
 ## Modules
@@ -278,7 +276,7 @@ Default: `"remote"`
 
 ### <a name="input_enable_waypoint"></a> [enable\_waypoint](#input\_enable\_waypoint)
 
-Description: (Optional) Whether or not to enable HCP Waypoint for the organization. Defaults to `false`.
+Description: (Optional) Whether or not to enable HCP Waypoint in the organization. Defaults to `false`.
 
 Type: `bool`
 
@@ -286,7 +284,7 @@ Default: `false`
 
 ### <a name="input_hcp_foundation_project_description"></a> [hcp\_foundation\_project\_description](#input\_hcp\_foundation\_project\_description)
 
-Description: (Optional) A description for the project for HCP Terraform.
+Description: (Optional) A description for the project in HCP Terraform.
 
 Type: `string`
 
@@ -294,15 +292,15 @@ Default: `null`
 
 ### <a name="input_hcp_foundation_project_name"></a> [hcp\_foundation\_project\_name](#input\_hcp\_foundation\_project\_name)
 
-Description: (Optional) Name of the project for HCP Terraform.
+Description: (Optional) Name of the project in HCP Terraform.
 
 Type: `string`
 
-Default: `"HCP Terraform"`
+Default: `"HCP Foundation"`
 
 ### <a name="input_hcp_foundation_project_tags"></a> [hcp\_foundation\_project\_tags](#input\_hcp\_foundation\_project\_tags)
 
-Description: (Optional) A map of key-value tags to add to the project for HCP Terraform.
+Description: (Optional) A map of key-value tags to add to the project in HCP Terraform.
 
 Type: `map(string)`
 
@@ -622,7 +620,6 @@ The following resources are used by this module:
 - [github_actions_secret.modules_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
 - [github_actions_secret.policies_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
 - [github_actions_secret.projects_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
-- [hcp_waypoint_tfc_config.test](https://registry.terraform.io/providers/hashicorp/hcp/0.110.0/docs/resources/waypoint_tfc_config) (resource)
 - [tfe_organization.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/organization) (resource)
 - [tfe_organization_default_settings.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/organization_default_settings) (resource)
 - [tfe_project.hcp_foundation](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/project) (resource)
