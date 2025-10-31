@@ -83,7 +83,7 @@ resource "tfe_project" "hcp_foundation" {
 module "policies_factory_workspace" {
   source         = "./modules/tfe_workspace"
   count          = var.policies_factory_workspace_name != null ? 1 : 0
-  name           = var.policies_factory_workspace_name
+  name           = lower(var.policies_factory_workspace_name)
   agent_pool_id  = var.policies_factory_agent_pool_id
   description    = var.policies_factory_description
   execution_mode = var.policies_factory_execution_mode
@@ -167,7 +167,7 @@ module "policies_factory_git_teams" {
 module "modules_factory_workspace" {
   source         = "./modules/tfe_workspace"
   count          = var.modules_factory_workspace_name != null ? 1 : 0
-  name           = var.modules_factory_workspace_name
+  name           = lower(var.modules_factory_workspace_name)
   agent_pool_id  = var.modules_factory_agent_pool_id
   description    = var.modules_factory_description
   execution_mode = var.modules_factory_execution_mode
@@ -272,7 +272,7 @@ module "modules_factory_git_teams" {
 module "projects_factory_workspace" {
   source         = "./modules/tfe_workspace"
   count          = var.projects_factory_workspace_name != null ? 1 : 0
-  name           = var.projects_factory_workspace_name
+  name           = lower(var.projects_factory_workspace_name)
   agent_pool_id  = var.projects_factory_agent_pool_id
   description    = var.projects_factory_description
   execution_mode = var.projects_factory_execution_mode
