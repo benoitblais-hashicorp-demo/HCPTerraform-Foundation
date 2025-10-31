@@ -83,7 +83,7 @@ resource "tfe_project" "hcp_foundation" {
 module "policies_factory_workspace" {
   source         = "./modules/tfe_workspace"
   count          = var.policies_factory_workspace_name != null ? 1 : 0
-  name           = var.policies_factory_workspace_name
+  name           = lower(var.policies_factory_workspace_name)
   agent_pool_id  = var.policies_factory_agent_pool_id
   description    = var.policies_factory_description
   execution_mode = var.policies_factory_execution_mode
@@ -133,7 +133,7 @@ resource "tfe_variable" "policies_factory" {
 module "policies_factory_repository" {
   source      = "./modules/git_repository"
   count       = length(module.policies_factory_workspace) > 0 != null ? 1 : 0
-  name        = module.policies_factory_workspace[0].workspace.name
+  name        = var.policies_factory_workspace_name
   description = module.policies_factory_workspace[0].workspace.description
   topics      = ["factory", "terraform-workspace", "terraform", "terraform-managed"]
 }
@@ -167,7 +167,7 @@ module "policies_factory_git_teams" {
 module "modules_factory_workspace" {
   source         = "./modules/tfe_workspace"
   count          = var.modules_factory_workspace_name != null ? 1 : 0
-  name           = var.modules_factory_workspace_name
+  name           = lower(var.modules_factory_workspace_name)
   agent_pool_id  = var.modules_factory_agent_pool_id
   description    = var.modules_factory_description
   execution_mode = var.modules_factory_execution_mode
@@ -238,7 +238,7 @@ resource "tfe_variable" "modules_factory_organization_name" {
 module "modules_factory_repository" {
   source      = "./modules/git_repository"
   count       = length(module.modules_factory_workspace) > 0 != null ? 1 : 0
-  name        = module.modules_factory_workspace[0].workspace.name
+  name        = var.modules_factory_workspace_name
   description = module.modules_factory_workspace[0].workspace.description
   topics      = ["factory", "terraform-workspace", "terraform", "terraform-managed"]
 }
@@ -272,7 +272,7 @@ module "modules_factory_git_teams" {
 module "projects_factory_workspace" {
   source         = "./modules/tfe_workspace"
   count          = var.projects_factory_workspace_name != null ? 1 : 0
-  name           = var.projects_factory_workspace_name
+  name           = lower(var.projects_factory_workspace_name)
   agent_pool_id  = var.projects_factory_agent_pool_id
   description    = var.projects_factory_description
   execution_mode = var.projects_factory_execution_mode
@@ -342,7 +342,7 @@ resource "tfe_variable" "projects_factory_organization_name" {
 module "projects_factory_repository" {
   source      = "./modules/git_repository"
   count       = length(module.projects_factory_workspace) > 0 != null ? 1 : 0
-  name        = module.projects_factory_workspace[0].workspace.name
+  name        = var.projects_factory_workspace_name
   description = module.projects_factory_workspace[0].workspace.description
   topics      = ["factory", "terraform-workspace", "terraform", "terraform-managed"]
 }
