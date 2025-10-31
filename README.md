@@ -198,6 +198,18 @@ Source: ./modules/tfe_team
 
 Version:
 
+### <a name="module_waypoint_repository"></a> [waypoint\_repository](#module\_waypoint\_repository)
+
+Source: ./modules/git_repository
+
+Version:
+
+### <a name="module_waypoint_workspace"></a> [waypoint\_workspace](#module\_waypoint\_workspace)
+
+Source: ./modules/tfe_workspace
+
+Version:
+
 ## Required Inputs
 
 The following input variables are required:
@@ -273,14 +285,6 @@ Description:  (Optional) Which execution mode to use as the default for all work
 Type: `string`
 
 Default: `"remote"`
-
-### <a name="input_enable_waypoint"></a> [enable\_waypoint](#input\_enable\_waypoint)
-
-Description: (Optional) Whether or not to enable HCP Waypoint in the organization. Defaults to `true`.
-
-Type: `bool`
-
-Default: `true`
 
 ### <a name="input_hcp_foundation_project_description"></a> [hcp\_foundation\_project\_description](#input\_hcp\_foundation\_project\_description)
 
@@ -374,6 +378,14 @@ Description: (Optional) Name of the workspace for the `modules factory`.
 Type: `string`
 
 Default: `"HCPTerraform-ModulesFactory"`
+
+### <a name="input_oauth_client_name"></a> [oauth\_client\_name](#input\_oauth\_client\_name)
+
+Description: (Optional) Name of the OAuth client.
+
+Type: `string`
+
+Default: `"GitHub"`
 
 ### <a name="input_owners_team_saml_role_id"></a> [owners\_team\_saml\_role\_id](#input\_owners\_team\_saml\_role\_id)
 
@@ -613,6 +625,38 @@ list(object({
 
 Default: `[]`
 
+### <a name="input_waypoint_agent_pool_id"></a> [waypoint\_agent\_pool\_id](#input\_waypoint\_agent\_pool\_id)
+
+Description: (Optional) The ID of an agent pool to assign to the workspace for `waypoint`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_waypoint_description"></a> [waypoint\_description](#input\_waypoint\_description)
+
+Description: (Optional) A description for the workspacel for `waypoint`.
+
+Type: `string`
+
+Default: `"Code to provision and manage HCP Waypoint using Terraform code (IaC)."`
+
+### <a name="input_waypoint_execution_mode"></a> [waypoint\_execution\_mode](#input\_waypoint\_execution\_mode)
+
+Description: (Optional) Which execution mode to use for the `policies factory`. Using Terraform Cloud, valid values are `remote`, `local` or `agent`. When set to `local`, the workspace will be used for state storage only. Important: If you omit this attribute, the resource configures the workspace to use your organization's default execution mode (which in turn defaults to `remote`), removing any explicit value that might have previously been set for the workspace.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_waypoint_workspace_name"></a> [waypoint\_workspace\_name](#input\_waypoint\_workspace\_name)
+
+Description: (Optional) Name of the workspace for `waypoint`.
+
+Type: `string`
+
+Default: `"HCPTerraform-Waypoint"`
+
 ## Resources
 
 The following resources are used by this module:
@@ -628,6 +672,7 @@ The following resources are used by this module:
 - [tfe_variable.policies_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.projects_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.projects_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+- [tfe_oauth_client.client](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/data-sources/oauth_client) (data source)
 
 ## Outputs
 
