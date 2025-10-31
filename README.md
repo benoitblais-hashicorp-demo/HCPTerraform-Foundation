@@ -204,6 +204,12 @@ Source: ./modules/git_repository
 
 Version:
 
+### <a name="module_waypoint_team"></a> [waypoint\_team](#module\_waypoint\_team)
+
+Source: ./modules/tfe_team
+
+Version:
+
 ### <a name="module_waypoint_workspace"></a> [waypoint\_workspace](#module\_waypoint\_workspace)
 
 Source: ./modules/tfe_workspace
@@ -648,6 +654,14 @@ Description: (Optional) Which execution mode to use for the `policies factory`. 
 Type: `string`
 
 Default: `null`
+
+### <a name="input_waypoint_team_name"></a> [waypoint\_team\_name](#input\_waypoint\_team\_name)
+
+Description: (Optional) Name of the team for `waypoint`.
+
+Type: `string`
+
+Default: `"HCPTerraform-Waypoint-Admins"`
 
 ### <a name="input_waypoint_workspace_name"></a> [waypoint\_workspace\_name](#input\_waypoint\_workspace\_name)
 
