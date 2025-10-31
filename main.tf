@@ -114,6 +114,7 @@ module "waypoint_workspace" {
 
 module "waypoint_team" {
   source                 = "./modules/tfe_team"
+  count                  = length(var.waypoint_workspace_name) > 0 ? 1 : 0
   name                   = var.waypoint_team_name
   organization           = tfe_organization.this.name
   organization_access    = {
@@ -125,6 +126,17 @@ module "waypoint_team" {
       }
   token                  = true
   visibility             = "organization"
+}
+
+# The following resource block is used to create and manage the variable required at the workspace level.
+
+resource "tfe_variable" "waypoint" {
+  count        = length(module.waypoint_team) > 0 ? 1 : 0
+  key          = "team_token"
+  value        = module.waypoint_team[0].token
+  category     = "terraform"
+  sensitive    = true
+  workspace_id = module.waypoint_workspace[0].id
 }
 
 # *********************************************************************************************** #
