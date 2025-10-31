@@ -97,15 +97,17 @@ module "waypoint_repository" {
 }
 
 module "waypoint_workspace" {
-  source         = "./modules/tfe_workspace"
-  count          = length(var.waypoint_workspace_name) > 0 ? 1 : 0
-  name           = lower(var.waypoint_workspace_name)
-  agent_pool_id  = var.waypoint_agent_pool_id
-  description    = var.waypoint_description
-  execution_mode = var.waypoint_execution_mode
-  organization   = tfe_organization.this.name
-  project_id     = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
-  tags           = merge(var.policies_factory_tag, { managed_by_terraform = true })
+  source                 = "./modules/tfe_workspace"
+  count                  = length(var.waypoint_workspace_name) > 0 ? 1 : 0
+  name                   = lower(var.waypoint_workspace_name)
+  agent_pool_id          = var.waypoint_agent_pool_id
+  auto_apply             = false
+  auto_apply_run_trigger = false
+  description            = var.waypoint_description
+  execution_mode         = var.waypoint_execution_mode
+  organization           = tfe_organization.this.name
+  project_id             = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
+  tags                   = merge(var.policies_factory_tag, { managed_by_terraform = true })
   vcs_repo = {
     identifier     = module.waypoint_repository[0].repository.full_name
     oauth_token_id = data.tfe_oauth_client.client[0].oauth_token_id
