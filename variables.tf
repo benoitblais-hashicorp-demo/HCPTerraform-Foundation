@@ -78,9 +78,9 @@ variable "default_execution_mode" {
 }
 
 variable "enable_waypoint" {
-  description = "(Optional) Whether or not to enable HCP Waypoint in the organization. Defaults to `false`."
+  description = "(Optional) Whether or not to enable HCP Waypoint in the organization. Defaults to `true`."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "hcp_foundation_project_description" {
