@@ -113,18 +113,18 @@ module "waypoint_workspace" {
 }
 
 module "waypoint_team" {
-  source                 = "./modules/tfe_team"
-  name                   = var.waypoint_team_name
-  organization           = tfe_organization.this.name
-  organization_access    = {
-        manage_membership          = true
-        manage_organization_access = true
-        manage_projects            = true
-        manage_teams               = true
-        manage_workspaces          = true
-      }
-  token                  = true
-  visibility             = "organization"
+  source       = "./modules/tfe_team"
+  name         = var.waypoint_team_name
+  organization = tfe_organization.this.name
+  organization_access = {
+    manage_membership          = true
+    manage_organization_access = true
+    manage_projects            = true
+    manage_teams               = true
+    manage_workspaces          = true
+  }
+  token      = true
+  visibility = "organization"
 }
 
 # *********************************************************************************************** #
