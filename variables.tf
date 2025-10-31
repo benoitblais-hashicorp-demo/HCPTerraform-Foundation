@@ -125,7 +125,6 @@ variable "session_remember_minutes" {
   default     = null
 }
 
-
 variable "session_timeout_minutes" {
   description = "(Optional) Session timeout after inactivity. Defaults to `20160`."
   type        = number
@@ -254,6 +253,13 @@ variable "waypoint_execution_mode" {
     condition     = var.waypoint_execution_mode != null ? contains(["null", "remote", "local", "agent"], var.waypoint_execution_mode) ? true : false : true
     error_message = "Valid values are \"remote\", \"local\" or \"agent\"."
   }
+}
+
+variable "waypoint_team_name" {
+  description = "(Optional) Name of the team for `waypoint`."
+  type        = string
+  nullable    = false
+  default     = "HCPTerraform-Waypoint-Admins"
 }
 
 # *********************************************************************************************** #

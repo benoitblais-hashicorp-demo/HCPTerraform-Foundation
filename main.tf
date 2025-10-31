@@ -49,25 +49,9 @@ module "agent_pool" {
 
 # The following code block is use to create and manage team at the organization level.
 
-locals {
-  teams = var.waypoint_workspace_name != null ? concat(var.teams, [
-    {
-      name = "waypoint"
-      organization_access = {
-        manage_membership          = true
-        manage_organization_access = true
-        manage_projects            = true
-        manage_teams               = true
-        manage_workspaces          = true
-      }
-      token = true
-    }
-  ]) : var.teams
-}
-
 module "teams" {
   source                 = "./modules/tfe_team"
-  for_each               = nonsensitive({ for team in local.teams : team.name => team })
+  for_each               = nonsensitive({ for team in var.teams : team.name => team })
   name                   = each.value.name
   organization           = tfe_organization.this.name
   organization_access    = try(each.value.organization_access, null)
@@ -112,8 +96,6 @@ module "waypoint_repository" {
   topics      = ["terraform-workspace", "terraform", "terraform-managed"]
 }
 
-
-
 module "waypoint_workspace" {
   source         = "./modules/tfe_workspace"
   count          = length(var.waypoint_workspace_name) > 0 ? 1 : 0
@@ -130,7 +112,20 @@ module "waypoint_workspace" {
   }
 }
 
-
+module "waypoint_team" {
+  source                 = "./modules/tfe_team"
+  name                   = var.waypoint_team_name
+  organization           = tfe_organization.this.name
+  organization_access    = {
+        manage_membership          = true
+        manage_organization_access = true
+        manage_projects            = true
+        manage_teams               = true
+        manage_workspaces          = true
+      }
+  token                  = true
+  visibility             = "organization"
+}
 
 # *********************************************************************************************** #
 #                                       Policies Factory                                          #
