@@ -50,7 +50,7 @@ module "agent_pool" {
 # The following code block is use to create and manage team at the organization level.
 
 locals {
-  teams = var.enable_waypoint ? merge(var.teams, [
+  teams = var.waypoint_workspace_name != null ? merge(var.teams, [
     {
       name = "waypoint"
       organization_access = {
