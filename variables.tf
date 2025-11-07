@@ -78,21 +78,21 @@ variable "default_execution_mode" {
 }
 
 variable "hcp_foundation_project_description" {
-  description = "(Optional) A description for the project for HCP Terraform."
+  description = "(Optional) A description for the project in HCP Terraform."
   type        = string
   nullable    = true
   default     = null
 }
 
 variable "hcp_foundation_project_name" {
-  description = "(Optional) Name of the project for HCP Terraform."
+  description = "(Optional) Name of the project in HCP Terraform."
   type        = string
   nullable    = true
-  default     = "HCP Terraform"
+  default     = "HCP Foundation"
 }
 
 variable "hcp_foundation_project_tags" {
-  description = "(Optional) A map of key-value tags to add to the project for HCP Terraform."
+  description = "(Optional) A map of key-value tags to add to the project in HCP Terraform."
   type        = map(string)
   nullable    = true
   default     = null
@@ -124,7 +124,6 @@ variable "session_remember_minutes" {
   nullable    = true
   default     = null
 }
-
 
 variable "session_timeout_minutes" {
   description = "(Optional) Session timeout after inactivity. Defaults to `20160`."
