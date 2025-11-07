@@ -475,7 +475,7 @@ variable "repositories_factory_workspace_name" {
   description = "(Optional) Name of the workspace for the `repositories factory`."
   type        = string
   nullable    = true
-  default     = "HCPTerraform-RepositoriesFactory"
+  default     = "GitHub-RepositoriesFactory"
 }
 
 variable "repositories_factory_agent_pool_id" {
@@ -489,7 +489,7 @@ variable "repositories_factory_description" {
   description = "(Optional) A description for the workspace for the `repositories factory`."
   type        = string
   nullable    = true
-  default     = "Code to provision and manage HCP Terraform repositories using Terraform code (IaC)."
+  default     = "Code to provision and manage GitHub repositories using Terraform code (IaC)."
 }
 
 variable "repositories_factory_execution_mode" {
