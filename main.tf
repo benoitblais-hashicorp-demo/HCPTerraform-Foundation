@@ -115,19 +115,19 @@ module "waypoint_workspace" {
 }
 
 module "waypoint_team" {
-  source                 = "./modules/tfe_team"
-  count                  = length(var.waypoint_workspace_name) > 0 ? 1 : 0
-  name                   = var.waypoint_team_name
-  organization           = tfe_organization.this.name
-  organization_access    = {
-        manage_membership          = true
-        manage_organization_access = true
-        manage_projects            = true
-        manage_teams               = true
-        manage_workspaces          = true
-      }
-  token                  = true
-  visibility             = "organization"
+  source       = "./modules/tfe_team"
+  count        = length(var.waypoint_workspace_name) > 0 ? 1 : 0
+  name         = var.waypoint_team_name
+  organization = tfe_organization.this.name
+  organization_access = {
+    manage_membership          = true
+    manage_organization_access = true
+    manage_projects            = true
+    manage_teams               = true
+    manage_workspaces          = true
+  }
+  token      = true
+  visibility = "organization"
 }
 
 # The following resource block is used to create and manage the variable required at the workspace level.
@@ -462,7 +462,7 @@ module "workspaces_factory_team_hcp" {
   organization_access = {
     manage_membership          = true
     manage_organization_access = true
-    manage_workspaces            = true
+    manage_workspaces          = true
     manage_teams               = true
     manage_workspaces          = true
   }
@@ -475,7 +475,7 @@ module "workspaces_factory_team_git" {
   name         = lower(replace("${module.workspaces_factory_workspace[0].workspace.name}-git", "/\\W|_|\\s/", "-"))
   organization = tfe_organization.this.name
   organization_access = {
-    manage_workspaces   = true # This is required to be able to create workspace from no-code module through GitHub Actions.
+    manage_workspaces = true # This is required to be able to create workspace from no-code module through GitHub Actions.
     manage_workspaces = true # This is required to be able to create workspace from no-code module through GitHub Actions.
   }
   token        = true
