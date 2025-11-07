@@ -433,3 +433,107 @@ module "projects_factory_git_teams" {
   permission  = try(each.value.permission, null)
   repository  = module.projects_factory_repository[0].repository.name
 }
+
+# *********************************************************************************************** #
+#                                      Workspaces Factory                                         #
+# *********************************************************************************************** #
+
+# The following module block is used to create and manage the workspace used by the `workspaces factory`.
+
+module "workspaces_factory_workspace" {
+  source         = "./modules/tfe_workspace"
+  count          = var.workspaces_factory_workspace_name != null ? 1 : 0
+  name           = lower(var.workspaces_factory_workspace_name)
+  agent_pool_id  = var.workspaces_factory_agent_pool_id
+  description    = var.workspaces_factory_description
+  execution_mode = var.workspaces_factory_execution_mode
+  organization   = tfe_organization.this.name
+  project_id     = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
+  tags           = merge(var.workspaces_factory_tag, { managed_by_terraform = true })
+}
+
+# The following module blocks are used to create and manage the HCP Terraform teams required by the `workspaces factory`.
+
+module "workspaces_factory_team_hcp" {
+  source       = "./modules/tfe_team"
+  count        = length(module.workspaces_factory_workspace) > 0 != null ? 1 : 0
+  name         = lower(replace("${module.workspaces_factory_workspace[0].workspace.name}-hcp", "/\\W|_|\\s/", "-"))
+  organization = tfe_organization.this.name
+  organization_access = {
+    manage_membership          = true
+    manage_organization_access = true
+    manage_workspaces          = true
+    manage_teams               = true
+    manage_workspaces          = true
+  }
+  token = true
+}
+
+module "workspaces_factory_team_git" {
+  source       = "./modules/tfe_team"
+  count        = length(module.workspaces_factory_workspace) > 0 != null ? 1 : 0
+  name         = lower(replace("${module.workspaces_factory_workspace[0].workspace.name}-git", "/\\W|_|\\s/", "-"))
+  organization = tfe_organization.this.name
+  organization_access = {
+    manage_workspaces = true # This is required to be able to create workspace from no-code module through GitHub Actions.
+    manage_workspaces = true # This is required to be able to create workspace from no-code module through GitHub Actions.
+  }
+  token        = true
+  workspace_id = module.workspaces_factory_workspace[0].id
+  workspace_permission = {
+    runs = "apply"
+  }
+}
+
+# The following resource block is used to create and manage the environment variable required at the workspace level to get authenticated into HCP Terraform by the workspace.
+
+resource "tfe_variable" "workspaces_factory" {
+  count        = length(module.workspaces_factory_team_hcp) > 0 ? 1 : 0
+  key          = "TFE_TOKEN"
+  value        = module.workspaces_factory_team_hcp[0].token
+  category     = "env"
+  sensitive    = true
+  workspace_id = module.workspaces_factory_workspace[0].id
+}
+
+# The following resource block is used to create and manage the terraform variable required at the workspace level.
+
+resource "tfe_variable" "workspaces_factory_organization_name" {
+  count        = length(module.workspaces_factory_team_hcp) > 0 ? 1 : 0
+  key          = "organization_name"
+  value        = var.organization_name
+  category     = "terraform"
+  description  = "(Required) Name of the organization."
+  sensitive    = false
+  workspace_id = module.workspaces_factory_workspace[0].id
+}
+
+# The following module block is used to create and manage the GitHub repository used by the `workspaces factory`.
+
+module "workspaces_factory_repository" {
+  source      = "./modules/git_repository"
+  count       = length(module.workspaces_factory_workspace) > 0 != null ? 1 : 0
+  name        = var.workspaces_factory_workspace_name
+  description = module.workspaces_factory_workspace[0].workspace.description
+  topics      = ["factory", "terraform-workspace", "terraform", "terraform-managed"]
+}
+
+# The following resource block is used to create and manage an action secret at the repository level for the `workspaces factory`.
+
+resource "github_actions_secret" "workspaces_factory" {
+  count           = length(module.workspaces_factory_repository) > 0 ? 1 : 0
+  repository      = module.workspaces_factory_repository[0].repository.name
+  secret_name     = "TFE_TOKEN"
+  plaintext_value = module.workspaces_factory_team_git[0].token
+}
+
+# The following module block is used to create and manage a GitHub team for the `workspaces factory`.
+
+module "workspaces_factory_git_teams" {
+  for_each    = { for team in var.workspaces_factory_github_teams : team.name => team }
+  source      = "./modules/git_team"
+  name        = each.value.name
+  description = try(each.value.description, null)
+  permission  = try(each.value.permission, null)
+  repository  = module.workspaces_factory_repository[0].repository.name
+}
