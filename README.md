@@ -587,7 +587,7 @@ Description: (Optional) A description for the workspace for the `repositories fa
 
 Type: `string`
 
-Default: `"Code to provision and manage HCP Terraform repositories using Terraform code (IaC)."`
+Default: `"Code to provision and manage GitHub repositories using Terraform code (IaC)."`
 
 ### <a name="input_repositories_factory_execution_mode"></a> [repositories\_factory\_execution\_mode](#input\_repositories\_factory\_execution\_mode)
 
@@ -640,7 +640,7 @@ Description: (Optional) Name of the workspace for the `repositories factory`.
 
 Type: `string`
 
-Default: `"HCPTerraform-RepositoriesFactory"`
+Default: `"GitHub-RepositoriesFactory"`
 
 ### <a name="input_send_passing_statuses_for_untriggered_speculative_plans"></a> [send\_passing\_statuses\_for\_untriggered\_speculative\_plans](#input\_send\_passing\_statuses\_for\_untriggered\_speculative\_plans)
 
