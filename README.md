@@ -397,14 +397,6 @@ Type: `string`
 
 Default: `"HCPTerraform-ModulesFactory"`
 
-### <a name="input_oauth_client_name"></a> [oauth\_client\_name](#input\_oauth\_client\_name)
-
-Description: (Optional) Name of the OAuth client.
-
-Type: `string`
-
-Default: `"GitHub"`
-
 ### <a name="input_owners_team_saml_role_id"></a> [owners\_team\_saml\_role\_id](#input\_owners\_team\_saml\_role\_id)
 
 Description: (Optional) The name of the "owners" team.
@@ -730,7 +722,6 @@ The following resources are used by this module:
 - [tfe_variable.projects_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.workspaces_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.workspaces_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
-- [tfe_oauth_client.client](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/data-sources/oauth_client) (data source)
 
 ## Outputs
 
