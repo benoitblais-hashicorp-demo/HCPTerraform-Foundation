@@ -62,14 +62,6 @@ module "teams" {
   visibility             = try(each.value.visibility, "organization")
 }
 
-# The following block is use to get information about an OAuth client.
-
-data "tfe_oauth_client" "client" {
-  count        = var.oauth_client_name != null ? 1 : 0
-  organization = var.organization_name
-  name         = var.oauth_client_name
-}
-
 # The following code block is use to create and manage the project where all the workspaces related to the foundation will be stored.
 
 resource "tfe_project" "hcp_foundation" {

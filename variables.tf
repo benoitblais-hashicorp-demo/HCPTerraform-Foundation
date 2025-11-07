@@ -98,13 +98,6 @@ variable "hcp_foundation_project_tags" {
   default     = null
 }
 
-variable "oauth_client_name" {
-  description = "(Optional) Name of the OAuth client."
-  type        = string
-  nullable    = false
-  default     = "GitHub"
-}
-
 variable "owners_team_saml_role_id" {
   description = "(Optional) The name of the \"owners\" team."
   type        = string
