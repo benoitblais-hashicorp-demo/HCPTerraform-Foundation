@@ -88,7 +88,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.13.0)
 
-- <a name="requirement_github"></a> [github](#requirement\_github) (~>6.6)
+- <a name="requirement_github"></a> [github](#requirement\_github) (~>6.6.0)
 
 - <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) (~>0.70)
 
@@ -198,6 +198,54 @@ Source: ./modules/tfe_team
 
 Version:
 
+### <a name="module_waypoint_repository"></a> [waypoint\_repository](#module\_waypoint\_repository)
+
+Source: ./modules/git_repository
+
+Version:
+
+### <a name="module_waypoint_team"></a> [waypoint\_team](#module\_waypoint\_team)
+
+Source: ./modules/tfe_team
+
+Version:
+
+### <a name="module_waypoint_workspace"></a> [waypoint\_workspace](#module\_waypoint\_workspace)
+
+Source: ./modules/tfe_workspace
+
+Version:
+
+### <a name="module_workspaces_factory_git_teams"></a> [workspaces\_factory\_git\_teams](#module\_workspaces\_factory\_git\_teams)
+
+Source: ./modules/git_team
+
+Version:
+
+### <a name="module_workspaces_factory_repository"></a> [workspaces\_factory\_repository](#module\_workspaces\_factory\_repository)
+
+Source: ./modules/git_repository
+
+Version:
+
+### <a name="module_workspaces_factory_team_git"></a> [workspaces\_factory\_team\_git](#module\_workspaces\_factory\_team\_git)
+
+Source: ./modules/tfe_team
+
+Version:
+
+### <a name="module_workspaces_factory_team_hcp"></a> [workspaces\_factory\_team\_hcp](#module\_workspaces\_factory\_team\_hcp)
+
+Source: ./modules/tfe_team
+
+Version:
+
+### <a name="module_workspaces_factory_workspace"></a> [workspaces\_factory\_workspace](#module\_workspaces\_factory\_workspace)
+
+Source: ./modules/tfe_workspace
+
+Version:
+
 ## Required Inputs
 
 The following input variables are required:
@@ -276,7 +324,7 @@ Default: `"remote"`
 
 ### <a name="input_hcp_foundation_project_description"></a> [hcp\_foundation\_project\_description](#input\_hcp\_foundation\_project\_description)
 
-Description: (Optional) A description for the project for HCP Terraform.
+Description: (Optional) A description for the project in HCP Terraform.
 
 Type: `string`
 
@@ -284,15 +332,15 @@ Default: `null`
 
 ### <a name="input_hcp_foundation_project_name"></a> [hcp\_foundation\_project\_name](#input\_hcp\_foundation\_project\_name)
 
-Description: (Optional) Name of the project for HCP Terraform.
+Description: (Optional) Name of the project in HCP Terraform.
 
 Type: `string`
 
-Default: `"HCP Terraform"`
+Default: `"HCP Foundation"`
 
 ### <a name="input_hcp_foundation_project_tags"></a> [hcp\_foundation\_project\_tags](#input\_hcp\_foundation\_project\_tags)
 
-Description: (Optional) A map of key-value tags to add to the project for HCP Terraform.
+Description: (Optional) A map of key-value tags to add to the project in HCP Terraform.
 
 Type: `map(string)`
 
@@ -366,6 +414,14 @@ Description: (Optional) Name of the workspace for the `modules factory`.
 Type: `string`
 
 Default: `"HCPTerraform-ModulesFactory"`
+
+### <a name="input_oauth_client_name"></a> [oauth\_client\_name](#input\_oauth\_client\_name)
+
+Description: (Optional) Name of the OAuth client.
+
+Type: `string`
+
+Default: `"GitHub"`
 
 ### <a name="input_owners_team_saml_role_id"></a> [owners\_team\_saml\_role\_id](#input\_owners\_team\_saml\_role\_id)
 
@@ -605,6 +661,115 @@ list(object({
 
 Default: `[]`
 
+### <a name="input_waypoint_agent_pool_id"></a> [waypoint\_agent\_pool\_id](#input\_waypoint\_agent\_pool\_id)
+
+Description: (Optional) The ID of an agent pool to assign to the workspace for `waypoint`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_waypoint_description"></a> [waypoint\_description](#input\_waypoint\_description)
+
+Description: (Optional) A description for the workspacel for `waypoint`.
+
+Type: `string`
+
+Default: `"Code to provision and manage HCP Waypoint using Terraform code (IaC)."`
+
+### <a name="input_waypoint_execution_mode"></a> [waypoint\_execution\_mode](#input\_waypoint\_execution\_mode)
+
+Description: (Optional) Which execution mode to use for the `policies factory`. Using Terraform Cloud, valid values are `remote`, `local` or `agent`. When set to `local`, the workspace will be used for state storage only. Important: If you omit this attribute, the resource configures the workspace to use your organization's default execution mode (which in turn defaults to `remote`), removing any explicit value that might have previously been set for the workspace.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_waypoint_team_name"></a> [waypoint\_team\_name](#input\_waypoint\_team\_name)
+
+Description: (Optional) Name of the team for `waypoint`.
+
+Type: `string`
+
+Default: `"HCPTerraform-Waypoint-Admins"`
+
+### <a name="input_waypoint_workspace_name"></a> [waypoint\_workspace\_name](#input\_waypoint\_workspace\_name)
+
+Description: (Optional) Name of the workspace for `waypoint`.
+
+Type: `string`
+
+Default: `"HCPTerraform-Waypoint"`
+
+### <a name="input_workspaces_factory_agent_pool_id"></a> [workspaces\_factory\_agent\_pool\_id](#input\_workspaces\_factory\_agent\_pool\_id)
+
+Description: (Optional) The ID of an agent pool to assign to the workspace for the `workspaces factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_workspaces_factory_description"></a> [workspaces\_factory\_description](#input\_workspaces\_factory\_description)
+
+Description: (Optional) A description for the workspace for the `workspaces factory`.
+
+Type: `string`
+
+Default: `"Code to provision and manage HCP Terraform workspaces using Terraform code (IaC)."`
+
+### <a name="input_workspaces_factory_execution_mode"></a> [workspaces\_factory\_execution\_mode](#input\_workspaces\_factory\_execution\_mode)
+
+Description: (Optional) Which execution mode to use for the `workspaces factory`. Using Terraform Cloud, valid values are `remote`, `local` or `agent`. When set to `local`, the workspace will be used for state storage only. Important: If you omit this attribute, the resource configures the workspace to use your organization's default execution mode (which in turn defaults to `remote`), removing any explicit value that might have previously been set for the workspace.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_workspaces_factory_github_teams"></a> [workspaces\_factory\_github\_teams](#input\_workspaces\_factory\_github\_teams)
+
+Description:   (Optional) The workspaces\_factory\_github\_teams block supports the following:  
+    name        : (Required) The name of the team.  
+    description : (Optional) A description of the team.  
+    permission  : (Optional) The permissions of team members regarding the repository. Must be one of `pull`, `triage`, `push`, `maintain`, `admin` or the name of an existing custom repository role within the organisation.
+
+Type:
+
+```hcl
+list(object({
+    name        = string
+    description = optional(string)
+    permission  = optional(string, "pull")
+  }))
+```
+
+Default:
+
+```json
+[
+  {
+    "description": "This group grant write access to the HCP Terraform workspaces repository.",
+    "name": "HCPTerraform-workspacesFactory-Contributors",
+    "permission": "push"
+  }
+]
+```
+
+### <a name="input_workspaces_factory_tag"></a> [workspaces\_factory\_tag](#input\_workspaces\_factory\_tag)
+
+Description: (Optional) A map of key value tags for this workspace for the `workspaces factory`.
+
+Type: `map(string)`
+
+Default: `null`
+
+### <a name="input_workspaces_factory_workspace_name"></a> [workspaces\_factory\_workspace\_name](#input\_workspaces\_factory\_workspace\_name)
+
+Description: (Optional) Name of the workspace for the `workspaces factory`.
+
+Type: `string`
+
+Default: `"HCPTerraform-WorkspacesFactory"`
+
 ## Resources
 
 The following resources are used by this module:
@@ -612,6 +777,7 @@ The following resources are used by this module:
 - [github_actions_secret.modules_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
 - [github_actions_secret.policies_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
 - [github_actions_secret.projects_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
+- [github_actions_secret.workspaces_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
 - [tfe_organization.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/organization) (resource)
 - [tfe_organization_default_settings.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/organization_default_settings) (resource)
 - [tfe_project.hcp_foundation](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/project) (resource)
@@ -620,10 +786,18 @@ The following resources are used by this module:
 - [tfe_variable.policies_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.projects_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.projects_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+- [tfe_variable.waypoint](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+- [tfe_variable.workspaces_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+- [tfe_variable.workspaces_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+- [tfe_oauth_client.client](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/data-sources/oauth_client) (data source)
 
 ## Outputs
 
-No outputs.
+The following outputs are exported:
+
+### <a name="output_teams"></a> [teams](#output\_teams)
+
+Description: List of Teams created
 
 <!-- markdownlint-enable -->
 <!-- END_TF_DOCS -->
