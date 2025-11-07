@@ -88,7 +88,7 @@ variable "hcp_foundation_project_name" {
   description = "(Optional) Name of the project in HCP Terraform."
   type        = string
   nullable    = true
-  default     = "HCP Foundation"
+  default     = "HCP Terraform"
 }
 
 variable "hcp_foundation_project_tags" {
@@ -462,6 +462,70 @@ variable "workspaces_factory_github_teams" {
 
 variable "workspaces_factory_tag" {
   description = "(Optional) A map of key value tags for this workspace for the `workspaces factory`."
+  type        = map(string)
+  nullable    = true
+  default     = null
+}
+
+# *********************************************************************************************** #
+#                                     Repositories Factory                                        #
+# *********************************************************************************************** #
+
+variable "repositories_factory_workspace_name" {
+  description = "(Optional) Name of the workspace for the `repositories factory`."
+  type        = string
+  nullable    = true
+  default     = "HCPTerraform-RepositoriesFactory"
+}
+
+variable "repositories_factory_agent_pool_id" {
+  description = "(Optional) The ID of an agent pool to assign to the workspace for the `repositories factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value."
+  type        = string
+  nullable    = true
+  default     = null
+}
+
+variable "repositories_factory_description" {
+  description = "(Optional) A description for the workspace for the `repositories factory`."
+  type        = string
+  nullable    = true
+  default     = "Code to provision and manage HCP Terraform repositories using Terraform code (IaC)."
+}
+
+variable "repositories_factory_execution_mode" {
+  description = "(Optional) Which execution mode to use for the `repositories factory`. Using Terraform Cloud, valid values are `remote`, `local` or `agent`. When set to `local`, the workspace will be used for state storage only. Important: If you omit this attribute, the resource configures the workspace to use your organization's default execution mode (which in turn defaults to `remote`), removing any explicit value that might have previously been set for the workspace."
+  type        = string
+  nullable    = true
+  default     = null
+
+  validation {
+    condition     = var.repositories_factory_execution_mode != null ? contains(["null", "remote", "local", "agent"], var.repositories_factory_execution_mode) ? true : false : true
+    error_message = "Valid values are \"remote\", \"local\" or \"agent\"."
+  }
+}
+
+variable "repositories_factory_github_teams" {
+  description = <<EOT
+  (Optional) The repositories_factory_github_teams block supports the following:
+    name        : (Required) The name of the team.
+    description : (Optional) A description of the team.
+    permission  : (Optional) The permissions of team members regarding the repository. Must be one of `pull`, `triage`, `push`, `maintain`, `admin` or the name of an existing custom repository role within the organisation.
+  EOT
+  type = list(object({
+    name        = string
+    description = optional(string)
+    permission  = optional(string, "pull")
+  }))
+  nullable = false
+  default = [{
+    name        = "HCPTerraform-repositoriesFactory-Contributors"
+    description = "This group grant write access to the HCP Terraform repositories repository."
+    permission  = "push"
+  }]
+}
+
+variable "repositories_factory_tag" {
+  description = "(Optional) A map of key value tags for this workspace for the `repositories factory`."
   type        = map(string)
   nullable    = true
   default     = null
