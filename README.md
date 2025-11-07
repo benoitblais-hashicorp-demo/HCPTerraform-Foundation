@@ -198,24 +198,6 @@ Source: ./modules/tfe_team
 
 Version:
 
-### <a name="module_waypoint_repository"></a> [waypoint\_repository](#module\_waypoint\_repository)
-
-Source: ./modules/git_repository
-
-Version:
-
-### <a name="module_waypoint_team"></a> [waypoint\_team](#module\_waypoint\_team)
-
-Source: ./modules/tfe_team
-
-Version:
-
-### <a name="module_waypoint_workspace"></a> [waypoint\_workspace](#module\_waypoint\_workspace)
-
-Source: ./modules/tfe_workspace
-
-Version:
-
 ### <a name="module_workspaces_factory_git_teams"></a> [workspaces\_factory\_git\_teams](#module\_workspaces\_factory\_git\_teams)
 
 Source: ./modules/git_team
@@ -414,14 +396,6 @@ Description: (Optional) Name of the workspace for the `modules factory`.
 Type: `string`
 
 Default: `"HCPTerraform-ModulesFactory"`
-
-### <a name="input_oauth_client_name"></a> [oauth\_client\_name](#input\_oauth\_client\_name)
-
-Description: (Optional) Name of the OAuth client.
-
-Type: `string`
-
-Default: `"GitHub"`
 
 ### <a name="input_owners_team_saml_role_id"></a> [owners\_team\_saml\_role\_id](#input\_owners\_team\_saml\_role\_id)
 
@@ -661,46 +635,6 @@ list(object({
 
 Default: `[]`
 
-### <a name="input_waypoint_agent_pool_id"></a> [waypoint\_agent\_pool\_id](#input\_waypoint\_agent\_pool\_id)
-
-Description: (Optional) The ID of an agent pool to assign to the workspace for `waypoint`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
-
-Type: `string`
-
-Default: `null`
-
-### <a name="input_waypoint_description"></a> [waypoint\_description](#input\_waypoint\_description)
-
-Description: (Optional) A description for the workspacel for `waypoint`.
-
-Type: `string`
-
-Default: `"Code to provision and manage HCP Waypoint using Terraform code (IaC)."`
-
-### <a name="input_waypoint_execution_mode"></a> [waypoint\_execution\_mode](#input\_waypoint\_execution\_mode)
-
-Description: (Optional) Which execution mode to use for the `policies factory`. Using Terraform Cloud, valid values are `remote`, `local` or `agent`. When set to `local`, the workspace will be used for state storage only. Important: If you omit this attribute, the resource configures the workspace to use your organization's default execution mode (which in turn defaults to `remote`), removing any explicit value that might have previously been set for the workspace.
-
-Type: `string`
-
-Default: `null`
-
-### <a name="input_waypoint_team_name"></a> [waypoint\_team\_name](#input\_waypoint\_team\_name)
-
-Description: (Optional) Name of the team for `waypoint`.
-
-Type: `string`
-
-Default: `"HCPTerraform-Waypoint-Admins"`
-
-### <a name="input_waypoint_workspace_name"></a> [waypoint\_workspace\_name](#input\_waypoint\_workspace\_name)
-
-Description: (Optional) Name of the workspace for `waypoint`.
-
-Type: `string`
-
-Default: `"HCPTerraform-Waypoint"`
-
 ### <a name="input_workspaces_factory_agent_pool_id"></a> [workspaces\_factory\_agent\_pool\_id](#input\_workspaces\_factory\_agent\_pool\_id)
 
 Description: (Optional) The ID of an agent pool to assign to the workspace for the `workspaces factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
@@ -786,10 +720,8 @@ The following resources are used by this module:
 - [tfe_variable.policies_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.projects_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.projects_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
-- [tfe_variable.waypoint](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.workspaces_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.workspaces_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
-- [tfe_oauth_client.client](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/data-sources/oauth_client) (data source)
 
 ## Outputs
 

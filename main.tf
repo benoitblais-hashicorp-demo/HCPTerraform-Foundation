@@ -62,14 +62,6 @@ module "teams" {
   visibility             = try(each.value.visibility, "organization")
 }
 
-# The following block is use to get information about an OAuth client.
-
-data "tfe_oauth_client" "client" {
-  count        = var.oauth_client_name != null ? 1 : 0
-  organization = var.organization_name
-  name         = var.oauth_client_name
-}
-
 # The following code block is use to create and manage the project where all the workspaces related to the foundation will be stored.
 
 resource "tfe_project" "hcp_foundation" {
@@ -80,65 +72,6 @@ resource "tfe_project" "hcp_foundation" {
   tags = merge(var.hcp_foundation_project_tags, {
     managed_by_terraform = "true"
   })
-}
-
-# *********************************************************************************************** #
-#                                         HCP Waypoint                                            #
-# *********************************************************************************************** #
-
-# The following module block is used to create and manage the GitHub repository used by the `waypoint`.
-
-module "waypoint_repository" {
-  source      = "./modules/git_repository"
-  count       = var.waypoint_workspace_name != null ? 1 : 0
-  name        = var.waypoint_workspace_name
-  description = var.waypoint_description
-  topics      = ["terraform-workspace", "terraform", "terraform-managed"]
-}
-
-module "waypoint_workspace" {
-  source                 = "./modules/tfe_workspace"
-  count                  = length(var.waypoint_workspace_name) > 0 ? 1 : 0
-  name                   = lower(var.waypoint_workspace_name)
-  agent_pool_id          = var.waypoint_agent_pool_id
-  auto_apply             = false
-  auto_apply_run_trigger = false
-  description            = var.waypoint_description
-  execution_mode         = var.waypoint_execution_mode
-  organization           = tfe_organization.this.name
-  project_id             = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
-  tags                   = merge(var.policies_factory_tag, { managed_by_terraform = true })
-  vcs_repo = {
-    identifier     = module.waypoint_repository[0].repository.full_name
-    oauth_token_id = data.tfe_oauth_client.client[0].oauth_token_id
-  }
-}
-
-module "waypoint_team" {
-  source       = "./modules/tfe_team"
-  count        = length(var.waypoint_workspace_name) > 0 ? 1 : 0
-  name         = var.waypoint_team_name
-  organization = tfe_organization.this.name
-  organization_access = {
-    manage_membership          = true
-    manage_organization_access = true
-    manage_projects            = true
-    manage_teams               = true
-    manage_workspaces          = true
-  }
-  token      = true
-  visibility = "organization"
-}
-
-# The following resource block is used to create and manage the variable required at the workspace level.
-
-resource "tfe_variable" "waypoint" {
-  count        = length(module.waypoint_team) > 0 ? 1 : 0
-  key          = "team_token"
-  value        = module.waypoint_team[0].token
-  category     = "terraform"
-  sensitive    = true
-  workspace_id = module.waypoint_workspace[0].id
 }
 
 # *********************************************************************************************** #
@@ -462,7 +395,7 @@ module "workspaces_factory_team_hcp" {
   organization_access = {
     manage_membership          = true
     manage_organization_access = true
-    manage_workspaces          = true
+    manage_projects            = true
     manage_teams               = true
     manage_workspaces          = true
   }
@@ -475,7 +408,7 @@ module "workspaces_factory_team_git" {
   name         = lower(replace("${module.workspaces_factory_workspace[0].workspace.name}-git", "/\\W|_|\\s/", "-"))
   organization = tfe_organization.this.name
   organization_access = {
-    manage_workspaces = true # This is required to be able to create workspace from no-code module through GitHub Actions.
+    manage_projects   = true # This is required to be able to create workspace from no-code module through GitHub Actions.
     manage_workspaces = true # This is required to be able to create workspace from no-code module through GitHub Actions.
   }
   token        = true
