@@ -501,8 +501,8 @@ module "repositories_factory_team_hcp" {
   name         = lower(replace("${module.repositories_factory_workspace[0].workspace.name}-hcp", "/\\W|_|\\s/", "-"))
   organization = tfe_organization.this.name
   organization_access = {
-    manage_projects            = true
-    manage_workspaces          = true
+    manage_projects   = true
+    manage_workspaces = true
   }
   token = true
 }
