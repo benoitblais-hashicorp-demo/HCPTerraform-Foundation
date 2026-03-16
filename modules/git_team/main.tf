@@ -1,6 +1,5 @@
 resource "github_team" "this" {
   name                      = var.name
-  create_default_maintainer = var.create_default_maintainer
   description               = var.description
   ldap_dn                   = var.ldap_dn
   parent_team_id            = var.parent_team_id

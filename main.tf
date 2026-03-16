@@ -145,7 +145,6 @@ resource "github_actions_secret" "policies_factory" {
   count            = length(module.policies_factory_repository) > 0 ? 1 : 0
   repository       = module.policies_factory_repository[0].repository.name
   secret_name      = "TFE_TOKEN"
-  destroy_on_drift = false
   plaintext_value  = module.policies_factory_team_git[0].token
 }
 
@@ -251,7 +250,6 @@ resource "github_actions_secret" "modules_factory" {
   count            = length(module.modules_factory_repository) > 0 ? 1 : 0
   repository       = module.modules_factory_repository[0].repository.name
   secret_name      = "TFE_TOKEN"
-  destroy_on_drift = false
   plaintext_value  = module.modules_factory_team_git[0].token
 }
 
@@ -356,7 +354,6 @@ resource "github_actions_secret" "projects_factory" {
   count            = length(module.projects_factory_repository) > 0 ? 1 : 0
   repository       = module.projects_factory_repository[0].repository.name
   secret_name      = "TFE_TOKEN"
-  destroy_on_drift = false
   plaintext_value  = module.projects_factory_team_git[0].token
 }
 
@@ -461,7 +458,6 @@ resource "github_actions_secret" "workspaces_factory" {
   count            = length(module.workspaces_factory_repository) > 0 ? 1 : 0
   repository       = module.workspaces_factory_repository[0].repository.name
   secret_name      = "TFE_TOKEN"
-  destroy_on_drift = false
   plaintext_value  = module.workspaces_factory_team_git[0].token
 }
 
@@ -563,7 +559,6 @@ resource "github_actions_secret" "repositories_factory" {
   count            = length(module.repositories_factory_repository) > 0 ? 1 : 0
   repository       = module.repositories_factory_repository[0].repository.name
   secret_name      = "TFE_TOKEN"
-  destroy_on_drift = false
   plaintext_value  = module.repositories_factory_team_git[0].token
 }
 
