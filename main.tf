@@ -13,6 +13,7 @@ resource "tfe_organization" "this" {
   session_remember_minutes                                = var.session_remember_minutes
   session_timeout_minutes                                 = var.session_timeout_minutes
   speculative_plan_management_enabled                     = var.speculative_plan_management_enabled
+  stacks_enabled                                          = var.stacks_enabled
 }
 
 # The following code block must be use to import de organization into terraform.  Once it's done, you can remove it.
