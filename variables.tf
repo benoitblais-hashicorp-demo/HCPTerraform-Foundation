@@ -131,6 +131,12 @@ variable "speculative_plan_management_enabled" {
   default     = true
 }
 
+variable "stacks_enabled" {
+  description = "(Optional) Whether or not to enable Stacks. Defaults to `true`."
+  type        = bool
+  default     = true
+}
+
 variable "teams" {
   description = <<EOT
   (Optional) The teams block supports the following:
