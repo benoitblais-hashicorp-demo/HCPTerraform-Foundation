@@ -142,10 +142,10 @@ module "policies_factory_repository" {
 # The following resource block is used to create and manage an action secret at the repository level for the `policies factory`.
 
 resource "github_actions_secret" "policies_factory" {
-  count            = length(module.policies_factory_repository) > 0 ? 1 : 0
-  repository       = module.policies_factory_repository[0].repository.name
-  secret_name      = "TFE_TOKEN"
-  plaintext_value  = module.policies_factory_team_git[0].token
+  count           = length(module.policies_factory_repository) > 0 ? 1 : 0
+  repository      = module.policies_factory_repository[0].repository.name
+  secret_name     = "TFE_TOKEN"
+  plaintext_value = module.policies_factory_team_git[0].token
 }
 
 # The following module block is used to create and manage a GitHub team for the `policies factory`.
@@ -247,10 +247,10 @@ module "modules_factory_repository" {
 # The following resource block is used to create and manage an action secret at the repository level for the `modules factory`.
 
 resource "github_actions_secret" "modules_factory" {
-  count            = length(module.modules_factory_repository) > 0 ? 1 : 0
-  repository       = module.modules_factory_repository[0].repository.name
-  secret_name      = "TFE_TOKEN"
-  plaintext_value  = module.modules_factory_team_git[0].token
+  count           = length(module.modules_factory_repository) > 0 ? 1 : 0
+  repository      = module.modules_factory_repository[0].repository.name
+  secret_name     = "TFE_TOKEN"
+  plaintext_value = module.modules_factory_team_git[0].token
 }
 
 # The following module block is used to create and manage a GitHub team for the `modules factory`.
@@ -351,10 +351,10 @@ module "projects_factory_repository" {
 # The following resource block is used to create and manage an action secret at the repository level for the `projects factory`.
 
 resource "github_actions_secret" "projects_factory" {
-  count            = length(module.projects_factory_repository) > 0 ? 1 : 0
-  repository       = module.projects_factory_repository[0].repository.name
-  secret_name      = "TFE_TOKEN"
-  plaintext_value  = module.projects_factory_team_git[0].token
+  count           = length(module.projects_factory_repository) > 0 ? 1 : 0
+  repository      = module.projects_factory_repository[0].repository.name
+  secret_name     = "TFE_TOKEN"
+  plaintext_value = module.projects_factory_team_git[0].token
 }
 
 # The following module block is used to create and manage a GitHub team for the `projects factory`.
@@ -455,10 +455,10 @@ module "workspaces_factory_repository" {
 # The following resource block is used to create and manage an action secret at the repository level for the `workspaces factory`.
 
 resource "github_actions_secret" "workspaces_factory" {
-  count            = length(module.workspaces_factory_repository) > 0 ? 1 : 0
-  repository       = module.workspaces_factory_repository[0].repository.name
-  secret_name      = "TFE_TOKEN"
-  plaintext_value  = module.workspaces_factory_team_git[0].token
+  count           = length(module.workspaces_factory_repository) > 0 ? 1 : 0
+  repository      = module.workspaces_factory_repository[0].repository.name
+  secret_name     = "TFE_TOKEN"
+  plaintext_value = module.workspaces_factory_team_git[0].token
 }
 
 # The following module block is used to create and manage a GitHub team for the `workspaces factory`.
@@ -556,10 +556,10 @@ module "repositories_factory_repository" {
 # The following resource block is used to create and manage an action secret at the repository level for the `repositories factory`.
 
 resource "github_actions_secret" "repositories_factory" {
-  count            = length(module.repositories_factory_repository) > 0 ? 1 : 0
-  repository       = module.repositories_factory_repository[0].repository.name
-  secret_name      = "TFE_TOKEN"
-  plaintext_value  = module.repositories_factory_team_git[0].token
+  count           = length(module.repositories_factory_repository) > 0 ? 1 : 0
+  repository      = module.repositories_factory_repository[0].repository.name
+  secret_name     = "TFE_TOKEN"
+  plaintext_value = module.repositories_factory_team_git[0].token
 }
 
 # The following module block is used to create and manage a GitHub team for the `repositories factory`.
