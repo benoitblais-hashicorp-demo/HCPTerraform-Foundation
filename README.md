@@ -674,6 +674,14 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_stacks_enabled"></a> [stacks\_enabled](#input\_stacks\_enabled)
+
+Description: (Optional) Whether or not to enable Stacks. Defaults to `true`.
+
+Type: `bool`
+
+Default: `true`
+
 ### <a name="input_teams"></a> [teams](#input\_teams)
 
 Description:   (Optional) The teams block supports the following:  
