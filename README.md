@@ -1,4 +1,95 @@
 <!-- BEGIN_TF_DOCS -->
+# HCP Terraform Foundation
+
+Code which manages configuration and life-cycle of all the HCP Terraform
+foundation. It is designed to be used from a dedicated VCS-Driven Terraform
+workspace that would provision and manage the configuration using
+Terraform code (IaC).
+
+## Permissions
+
+### HCP Terraform Permissions
+
+To manage the resources from that code, provide a token from an account with
+`owner` permissions. Alternatively, you can use a token from the `owner` team
+instead of a user token.
+
+### GitHub Permissions
+
+To manage the GitHub resources, provide a token from an account or a GitHub App with
+appropriate permissions. It should have:
+
+* Read access to `metadata`
+* Read and write access to `administration`, `code`, `secrets`, and `members`.
+
+## Authentication
+
+### HCP Terraform Authentication
+
+The HCP Terraform provider requires a HCP Terraform/Terraform Enterprise API token in
+order to manage resources.
+
+There are several ways to provide the required token:
+
+* Set the `token` argument in the provider configuration. You can set the token argument in the provider configuration. Use an
+input variable for the token.
+* Set the `TFE_TOKEN` environment variable. The provider can read the TFE\_TOKEN environment variable and the token stored there
+to authenticate.
+
+### GitHub Authentication
+
+The GitHub provider requires a GitHub token or GitHub App installation in order to manage resources.
+
+There are several ways to provide the required token:
+
+* Set the `token` argument in the provider configuration. You can set the `token` argument in the provider configuration. Use an
+input variable for the token.
+* Set the `GITHUB_TOKEN` environment variable. The provider can read the `GITHUB_TOKEN` environment variable and the token stored there
+to authenticate.
+
+There are several ways to provide the required GitHub App installation:
+
+* Set the `app_auth` argument in the provider configuration. You can set the app\_auth argument with the id, installation\_id and pem\_file
+in the provider configuration. The owner parameter is also required in this situation.
+* Set the `GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID` and `GITHUB_APP_PEM_FILE` environment variables. The provider can read the GITHUB\_APP\_ID,
+GITHUB\_APP\_INSTALLATION\_ID and GITHUB\_APP\_PEM\_FILE environment variables to authenticate.
+
+> Because strings with new lines is not support:</br>
+> use "\\\n" within the `pem_file` argument to replace new line</br>
+> use "\n" within the `GITHUB_APP_PEM_FILE` environment variables to replace new line</br>
+
+## Features
+
+* Manages configuration and life-cycle of HCP Terraform resources:
+  * projects
+  * workspaces
+  * teams
+  * variable sets
+  * variables
+  * notifications
+  * run tasks
+
+## Prerequisite
+
+In order to deploy the configuration from this code, you must first create
+an organization. You must then configure a [VCS Provider](https://github.com/benoitblais-hashicorp/HCPTerraform-Foundation/blob/main/docs/VCS-Provider.md)
+before manually creating a dedicated VCS-driven workspace in the UI.
+
+To authenticate into HCP Terraform during configuration deployment, an
+API token must be created. This token must come from an account with `owner`
+permission or the `owner` team. An environment variable `TFE_TOKEN` must be
+created in the previously created workspace with the value of the generated token.
+
+## Manual Configurations
+
+Currently, there are some HCP Terraform organization-level settings that are not fully exposed or supported by the `hashicorp/tfe` Terraform provider and must be configured manually via the HCP Terraform UI:
+
+1. **Maximum Time To Live (TTL) for API Tokens**: You can configure a maximum TTL for user and team API tokens to enhance security. This must be set manually in your Organization Settings.
+2. **Recoverable Items (Data Retention Policy)**: Enabling or configuring the retention window for deleted (recoverable) workspaces, networks, or other items is not yet possible through Terraform.
+3. **IP Allow List (Inbound Allow List)**: Restricting inbound access to HCP Terraform workspaces and API endpoints to specific IP ranges must be done natively in the UI.
+
+## Documentation
+
 ## Requirements
 
 The following requirements are needed by this module:
@@ -8,14 +99,6 @@ The following requirements are needed by this module:
 - <a name="requirement_github"></a> [github](#requirement\_github) (~> 6.11.0)
 
 - <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) (~> 0.74)
-
-## Providers
-
-The following providers are used by this module:
-
-- <a name="provider_github"></a> [github](#provider\_github) (~> 6.11.0)
-
-- <a name="provider_tfe"></a> [tfe](#provider\_tfe) (~> 0.74)
 
 ## Modules
 
@@ -182,28 +265,6 @@ Version:
 Source: ./modules/tfe_workspace
 
 Version:
-
-## Resources
-
-The following resources are used by this module:
-
-- [github_actions_secret.modules_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
-- [github_actions_secret.policies_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
-- [github_actions_secret.projects_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
-- [github_actions_secret.repositories_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
-- [github_actions_secret.workspaces_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
-- [tfe_organization.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/organization) (resource)
-- [tfe_organization_default_settings.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/organization_default_settings) (resource)
-- [tfe_project.hcp_foundation](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/project) (resource)
-- [tfe_variable.modules_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
-- [tfe_variable.modules_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
-- [tfe_variable.policies_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
-- [tfe_variable.projects_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
-- [tfe_variable.projects_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
-- [tfe_variable.repositories_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
-- [tfe_variable.repositories_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
-- [tfe_variable.workspaces_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
-- [tfe_variable.workspaces_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 
 ## Required Inputs
 
@@ -766,6 +827,28 @@ Type: `string`
 
 Default: `"HCPTerraform-WorkspacesFactory"`
 
+## Resources
+
+The following resources are used by this module:
+
+- [github_actions_secret.modules_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
+- [github_actions_secret.policies_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
+- [github_actions_secret.projects_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
+- [github_actions_secret.repositories_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
+- [github_actions_secret.workspaces_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
+- [tfe_organization.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/organization) (resource)
+- [tfe_organization_default_settings.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/organization_default_settings) (resource)
+- [tfe_project.hcp_foundation](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/project) (resource)
+- [tfe_variable.modules_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+- [tfe_variable.modules_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+- [tfe_variable.policies_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+- [tfe_variable.projects_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+- [tfe_variable.projects_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+- [tfe_variable.repositories_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+- [tfe_variable.repositories_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+- [tfe_variable.workspaces_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+- [tfe_variable.workspaces_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+
 ## Outputs
 
 The following outputs are exported:
@@ -773,4 +856,6 @@ The following outputs are exported:
 ### <a name="output_teams"></a> [teams](#output\_teams)
 
 Description: List of Teams created
+
+<!-- markdownlint-enable -->
 <!-- END_TF_DOCS -->
