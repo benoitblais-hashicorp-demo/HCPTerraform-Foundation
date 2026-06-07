@@ -15,7 +15,11 @@ output "resource_count" {
 
 output "workspace" {
   description = "Terraform Cloud workspace resource."
-  value       = tfe_workspace.this
+  value       = {
+    id          = tfe_workspace.this.id
+    name        = tfe_workspace.this.name
+    description = tfe_workspace.this.description
+  }
 }
 
 output "workspace_run_tasks" {

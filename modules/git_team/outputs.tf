@@ -15,5 +15,10 @@ output "slug" {
 
 output "team" {
   description = "GitHub team resource."
-  value       = github_team.this
+  value       = {
+    id      = github_team.this.id
+    name    = github_team.this.name
+    slug    = github_team.this.slug
+    node_id = github_team.this.node_id
+  }
 }
