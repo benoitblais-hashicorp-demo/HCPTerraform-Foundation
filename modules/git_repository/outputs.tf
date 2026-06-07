@@ -1,6 +1,6 @@
 output "repository" {
   description = "Repositories within your GitHub organization."
-  value       = {
+  value = {
     id   = github_repository.this.id
     name = github_repository.this.name
   }
