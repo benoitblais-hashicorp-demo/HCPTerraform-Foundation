@@ -53,6 +53,7 @@ When editing this file, note special instructions regarding HCP Terraform config
 ## README_footer.md
 
 When editing or creating `docs/README_footer.md`, ensure it contains:
+
 - An `External Documentation` section providing links to relevant external documentation used to develop the code (e.g., Terraform documentation, HCP Terraform provider documentation).
 
 ## Code Guidelines
