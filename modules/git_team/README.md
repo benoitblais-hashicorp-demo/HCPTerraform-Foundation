@@ -65,6 +65,10 @@ The following providers are used by this module:
 
 - <a name="provider_github"></a> [github](#provider\_github) (~>6.6)
 
+## Modules
+
+No modules.
+
 ## Resources
 
 The following resources are used by this module:

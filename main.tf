@@ -14,6 +14,7 @@ resource "tfe_organization" "this" {
   session_timeout_minutes                                 = var.session_timeout_minutes
   speculative_plan_management_enabled                     = var.speculative_plan_management_enabled
   stacks_enabled                                          = var.stacks_enabled
+  user_tokens_enabled                                     = var.user_tokens_enabled
 }
 
 # The following code block must be use to import de organization into terraform.  Once it's done, you can remove it.
@@ -41,11 +42,12 @@ resource "tfe_organization_default_settings" "this" {
 # The following code block is use to create and manage agent pools avaiable at the organization level.
 
 module "agent_pool" {
-  source            = "./modules/tfe_agent"
-  for_each          = toset(var.agent_pools)
-  name              = each.value
-  organization      = tfe_organization.this.name
-  token_description = ["token"]
+  source              = "./modules/tfe_agent"
+  for_each            = toset(var.agent_pools)
+  name                = each.value
+  organization        = tfe_organization.this.name
+  organization_scoped = true
+  token_description   = ["token"]
 }
 
 # The following code block is use to create and manage team at the organization level.

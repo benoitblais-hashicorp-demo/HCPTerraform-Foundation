@@ -10,6 +10,12 @@ variable "organization_name" {
   nullable    = false
 }
 
+variable "user_tokens_enabled" {
+  description = "(Optional) Whether user tokens can be used to read or update the organization."
+  type        = bool
+  default     = true
+}
+
 variable "agent_pools" {
   description = "(Optional) A list with the name of all the agent pools available at the organization level."
   type        = list(string)
