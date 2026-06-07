@@ -15,7 +15,7 @@ output "resource_count" {
 
 output "workspace" {
   description = "Terraform Cloud workspace resource."
-  value       = {
+  value = {
     id          = tfe_workspace.this.id
     name        = tfe_workspace.this.name
     description = tfe_workspace.this.description
