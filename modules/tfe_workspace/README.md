@@ -45,13 +45,13 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.13.0)
 
-- <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) (~> 0.74)
+- <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) (~> 0.78)
 
 ## Providers
 
 The following providers are used by this module:
 
-- <a name="provider_tfe"></a> [tfe](#provider\_tfe) (~> 0.74)
+- <a name="provider_tfe"></a> [tfe](#provider\_tfe) (~> 0.78)
 
 ## Modules
 
