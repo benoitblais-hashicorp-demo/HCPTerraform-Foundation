@@ -98,7 +98,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_github"></a> [github](#requirement\_github) (~> 6.11.0)
 
-- <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) (~> 0.78)
+- <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) (~> 0.80)
 
 ## Modules
 
