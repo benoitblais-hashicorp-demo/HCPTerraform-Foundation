@@ -260,24 +260,49 @@ variable "policies_factory_execution_mode" {
   }
 }
 
-variable "policies_factory_github_teams" {
-  description = <<EOT
-  (Optional) The policies_factory_github_teams block supports the following:
-    name        : (Required) The name of the team.
-    description : (Optional) A description of the team.
-    permission  : (Optional) The permissions of team members regarding the repository. Must be one of `pull`, `triage`, `push`, `maintain`, `admin` or the name of an existing custom repository role within the organisation.
-  EOT
+variable "policies_factory_branch_policies" {
+  description = "(Optional) Branch policy configurations for the `policies factory` Azure DevOps repository. See the `azuredevops_repository` module `branch_policies` variable for the full schema."
   type = list(object({
-    name        = string
-    description = optional(string)
-    permission  = optional(string, "pull")
+    branch_ref                 = string
+    match_type                 = optional(string, "Exact")
+    enabled                    = optional(bool, true)
+    blocking                   = optional(bool, true)
+    require_comment_resolution = optional(bool, false)
+    min_reviewers = optional(object({
+      reviewer_count                         = number
+      submitter_can_vote                     = optional(bool, false)
+      last_pusher_cannot_approve             = optional(bool, true)
+      allow_completion_with_rejects_or_waits = optional(bool, false)
+      on_push_reset_approved_votes           = optional(bool, true)
+      on_push_reset_all_votes                = optional(bool, false)
+    }), null)
+    merge_types = optional(object({
+      allow_squash                  = optional(bool, true)
+      allow_rebase_and_fast_forward = optional(bool, false)
+      allow_basic_no_fast_forward   = optional(bool, true)
+      allow_rebase_with_merge       = optional(bool, false)
+    }), null)
+    auto_reviewers = optional(object({
+      reviewer_ids       = list(string)
+      submitter_can_vote = optional(bool, false)
+      message            = optional(string, null)
+      path_filters       = optional(list(string), [])
+    }), null)
   }))
   nullable = false
-  default = [{
-    name        = "HCPTerraform-Policies-Contributors"
-    description = "This group grant write access to the HCP Terraform Policies repository."
-    permission  = "push"
-  }]
+  default = [
+    {
+      branch_ref                 = "refs/heads/main"
+      require_comment_resolution = true
+      min_reviewers = {
+        reviewer_count = 1
+      }
+      merge_types = {
+        allow_squash            = true
+        allow_basic_no_fast_forward = true
+      }
+    }
+  ]
 }
 
 variable "policies_factory_tag" {
@@ -324,24 +349,49 @@ variable "modules_factory_execution_mode" {
   }
 }
 
-variable "modules_factory_github_teams" {
-  description = <<EOT
-  (Optional) The modules_factory_github_teams block supports the following:
-    name        : (Required) The name of the team.
-    description : (Optional) A description of the team.
-    permission  : (Optional) The permissions of team members regarding the repository. Must be one of `pull`, `triage`, `push`, `maintain`, `admin` or the name of an existing custom repository role within the organisation.
-  EOT
+variable "modules_factory_branch_policies" {
+  description = "(Optional) Branch policy configurations for the `modules factory` Azure DevOps repository. See the `azuredevops_repository` module `branch_policies` variable for the full schema."
   type = list(object({
-    name        = string
-    description = optional(string)
-    permission  = optional(string, "pull")
+    branch_ref                 = string
+    match_type                 = optional(string, "Exact")
+    enabled                    = optional(bool, true)
+    blocking                   = optional(bool, true)
+    require_comment_resolution = optional(bool, false)
+    min_reviewers = optional(object({
+      reviewer_count                         = number
+      submitter_can_vote                     = optional(bool, false)
+      last_pusher_cannot_approve             = optional(bool, true)
+      allow_completion_with_rejects_or_waits = optional(bool, false)
+      on_push_reset_approved_votes           = optional(bool, true)
+      on_push_reset_all_votes                = optional(bool, false)
+    }), null)
+    merge_types = optional(object({
+      allow_squash                  = optional(bool, true)
+      allow_rebase_and_fast_forward = optional(bool, false)
+      allow_basic_no_fast_forward   = optional(bool, true)
+      allow_rebase_with_merge       = optional(bool, false)
+    }), null)
+    auto_reviewers = optional(object({
+      reviewer_ids       = list(string)
+      submitter_can_vote = optional(bool, false)
+      message            = optional(string, null)
+      path_filters       = optional(list(string), [])
+    }), null)
   }))
   nullable = false
-  default = [{
-    name        = "HCPTerraform-ModulesFactory-Contributors"
-    description = "This group grant write access to the HCP Terraform modules repository."
-    permission  = "push"
-  }]
+  default = [
+    {
+      branch_ref                 = "refs/heads/main"
+      require_comment_resolution = true
+      min_reviewers = {
+        reviewer_count = 1
+      }
+      merge_types = {
+        allow_squash            = true
+        allow_basic_no_fast_forward = true
+      }
+    }
+  ]
 }
 
 variable "modules_factory_tag" {
@@ -388,24 +438,49 @@ variable "projects_factory_execution_mode" {
   }
 }
 
-variable "projects_factory_github_teams" {
-  description = <<EOT
-  (Optional) The projects_factory_github_teams block supports the following:
-    name        : (Required) The name of the team.
-    description : (Optional) A description of the team.
-    permission  : (Optional) The permissions of team members regarding the repository. Must be one of `pull`, `triage`, `push`, `maintain`, `admin` or the name of an existing custom repository role within the organisation.
-  EOT
+variable "projects_factory_branch_policies" {
+  description = "(Optional) Branch policy configurations for the `projects factory` Azure DevOps repository. See the `azuredevops_repository` module `branch_policies` variable for the full schema."
   type = list(object({
-    name        = string
-    description = optional(string)
-    permission  = optional(string, "pull")
+    branch_ref                 = string
+    match_type                 = optional(string, "Exact")
+    enabled                    = optional(bool, true)
+    blocking                   = optional(bool, true)
+    require_comment_resolution = optional(bool, false)
+    min_reviewers = optional(object({
+      reviewer_count                         = number
+      submitter_can_vote                     = optional(bool, false)
+      last_pusher_cannot_approve             = optional(bool, true)
+      allow_completion_with_rejects_or_waits = optional(bool, false)
+      on_push_reset_approved_votes           = optional(bool, true)
+      on_push_reset_all_votes                = optional(bool, false)
+    }), null)
+    merge_types = optional(object({
+      allow_squash                  = optional(bool, true)
+      allow_rebase_and_fast_forward = optional(bool, false)
+      allow_basic_no_fast_forward   = optional(bool, true)
+      allow_rebase_with_merge       = optional(bool, false)
+    }), null)
+    auto_reviewers = optional(object({
+      reviewer_ids       = list(string)
+      submitter_can_vote = optional(bool, false)
+      message            = optional(string, null)
+      path_filters       = optional(list(string), [])
+    }), null)
   }))
   nullable = false
-  default = [{
-    name        = "HCPTerraform-ProjectsFactory-Contributors"
-    description = "This group grant write access to the HCP Terraform projects repository."
-    permission  = "push"
-  }]
+  default = [
+    {
+      branch_ref                 = "refs/heads/main"
+      require_comment_resolution = true
+      min_reviewers = {
+        reviewer_count = 1
+      }
+      merge_types = {
+        allow_squash            = true
+        allow_basic_no_fast_forward = true
+      }
+    }
+  ]
 }
 
 variable "projects_factory_tag" {
@@ -452,24 +527,49 @@ variable "workspaces_factory_execution_mode" {
   }
 }
 
-variable "workspaces_factory_github_teams" {
-  description = <<EOT
-  (Optional) The workspaces_factory_github_teams block supports the following:
-    name        : (Required) The name of the team.
-    description : (Optional) A description of the team.
-    permission  : (Optional) The permissions of team members regarding the repository. Must be one of `pull`, `triage`, `push`, `maintain`, `admin` or the name of an existing custom repository role within the organisation.
-  EOT
+variable "workspaces_factory_branch_policies" {
+  description = "(Optional) Branch policy configurations for the `workspaces factory` Azure DevOps repository. See the `azuredevops_repository` module `branch_policies` variable for the full schema."
   type = list(object({
-    name        = string
-    description = optional(string)
-    permission  = optional(string, "pull")
+    branch_ref                 = string
+    match_type                 = optional(string, "Exact")
+    enabled                    = optional(bool, true)
+    blocking                   = optional(bool, true)
+    require_comment_resolution = optional(bool, false)
+    min_reviewers = optional(object({
+      reviewer_count                         = number
+      submitter_can_vote                     = optional(bool, false)
+      last_pusher_cannot_approve             = optional(bool, true)
+      allow_completion_with_rejects_or_waits = optional(bool, false)
+      on_push_reset_approved_votes           = optional(bool, true)
+      on_push_reset_all_votes                = optional(bool, false)
+    }), null)
+    merge_types = optional(object({
+      allow_squash                  = optional(bool, true)
+      allow_rebase_and_fast_forward = optional(bool, false)
+      allow_basic_no_fast_forward   = optional(bool, true)
+      allow_rebase_with_merge       = optional(bool, false)
+    }), null)
+    auto_reviewers = optional(object({
+      reviewer_ids       = list(string)
+      submitter_can_vote = optional(bool, false)
+      message            = optional(string, null)
+      path_filters       = optional(list(string), [])
+    }), null)
   }))
   nullable = false
-  default = [{
-    name        = "HCPTerraform-workspacesFactory-Contributors"
-    description = "This group grant write access to the HCP Terraform workspaces repository."
-    permission  = "push"
-  }]
+  default = [
+    {
+      branch_ref                 = "refs/heads/main"
+      require_comment_resolution = true
+      min_reviewers = {
+        reviewer_count = 1
+      }
+      merge_types = {
+        allow_squash            = true
+        allow_basic_no_fast_forward = true
+      }
+    }
+  ]
 }
 
 variable "workspaces_factory_tag" {
@@ -487,7 +587,7 @@ variable "repositories_factory_workspace_name" {
   description = "(Optional) Name of the workspace for the `repositories factory`."
   type        = string
   nullable    = true
-  default     = "GitHub-RepositoriesFactory"
+  default     = "AzureDevOps-RepositoriesFactory"
 }
 
 variable "repositories_factory_agent_pool_id" {
@@ -501,7 +601,7 @@ variable "repositories_factory_description" {
   description = "(Optional) A description for the workspace for the `repositories factory`."
   type        = string
   nullable    = true
-  default     = "Code to provision and manage GitHub repositories using Terraform code (IaC)."
+  default     = "Code to provision and manage Azure DevOps repositories using Terraform code (IaC)."
 }
 
 variable "repositories_factory_execution_mode" {
@@ -516,24 +616,49 @@ variable "repositories_factory_execution_mode" {
   }
 }
 
-variable "repositories_factory_github_teams" {
-  description = <<EOT
-  (Optional) The repositories_factory_github_teams block supports the following:
-    name        : (Required) The name of the team.
-    description : (Optional) A description of the team.
-    permission  : (Optional) The permissions of team members regarding the repository. Must be one of `pull`, `triage`, `push`, `maintain`, `admin` or the name of an existing custom repository role within the organisation.
-  EOT
+variable "repositories_factory_branch_policies" {
+  description = "(Optional) Branch policy configurations for the `repositories factory` Azure DevOps repository. See the `azuredevops_repository` module `branch_policies` variable for the full schema."
   type = list(object({
-    name        = string
-    description = optional(string)
-    permission  = optional(string, "pull")
+    branch_ref                 = string
+    match_type                 = optional(string, "Exact")
+    enabled                    = optional(bool, true)
+    blocking                   = optional(bool, true)
+    require_comment_resolution = optional(bool, false)
+    min_reviewers = optional(object({
+      reviewer_count                         = number
+      submitter_can_vote                     = optional(bool, false)
+      last_pusher_cannot_approve             = optional(bool, true)
+      allow_completion_with_rejects_or_waits = optional(bool, false)
+      on_push_reset_approved_votes           = optional(bool, true)
+      on_push_reset_all_votes                = optional(bool, false)
+    }), null)
+    merge_types = optional(object({
+      allow_squash                  = optional(bool, true)
+      allow_rebase_and_fast_forward = optional(bool, false)
+      allow_basic_no_fast_forward   = optional(bool, true)
+      allow_rebase_with_merge       = optional(bool, false)
+    }), null)
+    auto_reviewers = optional(object({
+      reviewer_ids       = list(string)
+      submitter_can_vote = optional(bool, false)
+      message            = optional(string, null)
+      path_filters       = optional(list(string), [])
+    }), null)
   }))
   nullable = false
-  default = [{
-    name        = "HCPTerraform-repositoriesFactory-Contributors"
-    description = "This group grant write access to the HCP Terraform repositories repository."
-    permission  = "push"
-  }]
+  default = [
+    {
+      branch_ref                 = "refs/heads/main"
+      require_comment_resolution = true
+      min_reviewers = {
+        reviewer_count = 1
+      }
+      merge_types = {
+        allow_squash            = true
+        allow_basic_no_fast_forward = true
+      }
+    }
+  ]
 }
 
 variable "repositories_factory_tag" {
@@ -541,4 +666,26 @@ variable "repositories_factory_tag" {
   type        = map(string)
   nullable    = true
   default     = null
+}
+
+# *********************************************************************************************** #
+#                                        Azure DevOps                                             #
+# *********************************************************************************************** #
+
+variable "azuredevops_organization" {
+  description = "(Required) The name of the Azure DevOps organization (the segment after `dev.azure.com/` in the URL). Used to build the VCS identifier for HCP Terraform workspaces."
+  type        = string
+  nullable    = false
+}
+
+variable "azuredevops_project_id" {
+  description = "(Required) The ID or name of the Azure DevOps project in which all factory repositories will be created."
+  type        = string
+  nullable    = false
+}
+
+variable "vcs_oauth_client_name" {
+  description = "(Required) The name of the HCP Terraform OAuth client (VCS Provider connection) to use for VCS-driven workspaces. Find it in the HCP Terraform UI: Organization Settings → VCS Providers → the name is shown in the \"Name\" column of the connection list."
+  type        = string
+  nullable    = false
 }

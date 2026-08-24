@@ -13,13 +13,14 @@ To manage the resources from that code, provide a token from an account with
 `owner` permissions. Alternatively, you can use a token from the `owner` team
 instead of a user token.
 
-### GitHub Permissions
+### Azure DevOps Permissions
 
-To manage the GitHub resources, provide a token from an account or a GitHub App with
-appropriate permissions. It should have:
+To manage the Azure DevOps resources, provide a Personal Access Token (PAT) or
+configure a service principal with appropriate permissions. The identity must have:
 
-* Read access to `metadata`
-* Read and write access to `administration`, `code`, `secrets`, and `members`.
+* **Code**: Read & Write (to create and configure repositories)
+* **Project and Team**: Read (to read project information)
+* **Build**: Read & Execute (required for branch policies that reference build definitions)
 
 ## Authentication
 
@@ -35,27 +36,23 @@ input variable for the token.
 * Set the `TFE_TOKEN` environment variable. The provider can read the TFE_TOKEN environment variable and the token stored there
 to authenticate.
 
-### GitHub Authentication
+### Azure DevOps Authentication
 
-The GitHub provider requires a GitHub token or GitHub App installation in order to manage resources.
+The Azure DevOps provider requires a Personal Access Token (PAT) or service principal credentials
+in order to manage resources.
 
-There are several ways to provide the required token:
+There are several ways to provide the required credentials:
 
-* Set the `token` argument in the provider configuration. You can set the `token` argument in the provider configuration. Use an
-input variable for the token.
-* Set the `GITHUB_TOKEN` environment variable. The provider can read the `GITHUB_TOKEN` environment variable and the token stored there
-to authenticate.
+* Set the `AZDO_ORG_SERVICE_URL` environment variable to your Azure DevOps organization URL
+  (e.g., `https://dev.azure.com/your-org`).
+* Set the `AZDO_PERSONAL_ACCESS_TOKEN` environment variable to authenticate with a PAT.
 
-There are several ways to provide the required GitHub App installation:
+Alternatively, for service principal (OIDC/client secret) authentication, set:
+* `AZDO_CLIENT_ID` – the service principal client ID.
+* `AZDO_CLIENT_SECRET` or configure OIDC with `AZDO_TENANT_ID`.
 
-* Set the `app_auth` argument in the provider configuration. You can set the app_auth argument with the id, installation_id and pem_file
-in the provider configuration. The owner parameter is also required in this situation.
-* Set the `GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID` and `GITHUB_APP_PEM_FILE` environment variables. The provider can read the GITHUB_APP_ID,
-GITHUB_APP_INSTALLATION_ID and GITHUB_APP_PEM_FILE environment variables to authenticate.
-
-> Because strings with new lines is not support:</br>
-> use "\\\n" within the `pem_file` argument to replace new line</br>
-> use "\n" within the `GITHUB_APP_PEM_FILE` environment variables to replace new line</br>
+> **Note:** The PAT must be created with the scopes listed under **Azure DevOps Permissions** above.
+> Token TTL should be set according to your organization's security policy.
 
 ## Features
 
@@ -67,6 +64,9 @@ GITHUB_APP_INSTALLATION_ID and GITHUB_APP_PEM_FILE environment variables to auth
   * variables
   * notifications
   * run tasks
+* Manages Azure DevOps repository configuration:
+  * Git repositories (one per factory workspace)
+  * Branch policies (minimum reviewers, comment resolution, merge types, auto reviewers)
 
 ## Prerequisite
 
@@ -78,6 +78,9 @@ To authenticate into HCP Terraform during configuration deployment, an
 API token must be created. This token must come from an account with `owner`
 permission or the `owner` team. An environment variable `TFE_TOKEN` must be
 created in the previously created workspace with the value of the generated token.
+
+The Azure DevOps project (`azuredevops_project_id`) must already exist before
+this module is applied. Repositories will be created inside that project.
 
 ## Manual Configurations
 
