@@ -164,9 +164,8 @@ variable "teams" {
       read_projects              : (Optional) Allow members to view all projects within the organization. Requires read_workspaces to be set to true.
       read_workspaces            : (Optional) Allow members to view all workspaces in this organization.
     sso_team_id                  : (Optional) Unique Identifier to control team membership via SAML.
-    token                        : (Optional) If set to `true`, a team token will be generated.
+    token                        : (Optional) If set to `true`, a team token will be generated. The token expiration is automatically set to 24 months from the time of creation.
     token_description            : (Optional) The token's description, which must be unique per team. Required if creating multiple tokens for a single team.
-    token_expired_at             : (Optional) The token's expiration date. The expiration date must be a date/time string in RFC3339 format (e.g., '2024-12-31T23:59:59Z'). If no expiration date is supplied, the expiration date will default to null and never expire.
     token_force_regenerate       : (Optional) If set to `true`, a new token will be generated even if a token already exists. This will invalidate the existing token!
     visibility                   : (Optional) The visibility of the team (`secret` or `organization`).
   EOT
@@ -192,7 +191,6 @@ variable "teams" {
     sso_team_id            = optional(string)
     token                  = optional(bool, false)
     token_description      = optional(string)
-    token_expired_at       = optional(string)
     token_force_regenerate = optional(bool, false)
     visibility             = optional(string, "organization")
   }))
@@ -212,10 +210,6 @@ variable "teams" {
   validation {
     condition     = length([for team in var.teams : team.organization_access != null ? team.organization_access.manage_projects == true && team.organization_access.manage_workspaces != true ? false : true : true]) == length(var.teams)
     error_message = "`manage_projects` requires `manage_workspaces` to be set to `true`."
-  }
-  validation {
-    condition     = length([for team in var.teams : team.token_expired_at != null ? length(regexall("^((?:(\\d{4}-\\d{2}-\\d{2})T(\\d{2}:\\d{2}:\\d{2}))Z)$", team.token_expired_at)) > 0 ? true : false : true]) == length(var.teams)
-    error_message = "The expiration date must be a date/time string in RFC3339 format (e.g., '2024-12-31T23:59:59Z')."
   }
   validation {
     condition     = length([for team in var.teams : contains(["secret", "organization"], team.visibility)]) == length(var.teams)
@@ -678,14 +672,19 @@ variable "azuredevops_organization" {
   nullable    = false
 }
 
-variable "azuredevops_project_id" {
-  description = "(Required) The ID or name of the Azure DevOps project in which all factory repositories will be created."
+variable "azuredevops_project_name" {
+  description = "(Required) The name of the Azure DevOps project in which all factory repositories will be created. Used to look up the project UUID at plan time."
   type        = string
   nullable    = false
 }
 
-variable "vcs_oauth_client_name" {
-  description = "(Required) The name of the HCP Terraform OAuth client (VCS Provider connection) to use for VCS-driven workspaces. Find it in the HCP Terraform UI: Organization Settings → VCS Providers → the name is shown in the \"Name\" column of the connection list."
+variable "vcs_oauth_token_id" {
+  description = "(Required) The OAuth Token ID of the HCP Terraform VCS Provider connection to use for VCS-driven workspaces. Find it in the HCP Terraform UI: Organization Settings → VCS Providers → click the connection → the value starts with `ot-` (not `oc-`)."
   type        = string
   nullable    = false
+
+  validation {
+    condition     = can(regex("^ot-", var.vcs_oauth_token_id))
+    error_message = "The OAuth Token ID must start with `ot-`. You may have provided the OAuth Client ID (starts with `oc-`) instead."
+  }
 }

@@ -20,7 +20,7 @@ resource "tfe_organization" "this" {
 # The following code block must be use to import de organization into terraform.  Once it's done, you can remove it.
 
 # import {
-#   id = ""
+#   id = "benoitblais-azuredevops"
 #   to = tfe_organization.this
 # }
 
@@ -138,7 +138,6 @@ module "teams" {
   organization_access    = try(each.value.organization_access, null)
   sso_team_id            = try(each.value.sso_team_id, null)
   token                  = try(each.value.token, false)
-  token_expired_at       = try(each.value.token_expired_at, null)
   token_force_regenerate = try(each.value.token_force_regenerate, null)
   visibility             = try(each.value.visibility, "organization")
 }
@@ -155,12 +154,11 @@ resource "tfe_project" "hcp_foundation" {
   })
 }
 
-# The following data source looks up the HCP Terraform OAuth client by name so that the
-# policies factory workspace can reference its token ID without hard-coding the ID.
+# The following data source looks up the Azure DevOps project by name to obtain its UUID,
+# which is required by all azuredevops_* resources.
 
-data "tfe_oauth_client" "vcs" {
-  organization = tfe_organization.this.name
-  name         = var.vcs_oauth_client_name
+data "azuredevops_project" "this" {
+  name = var.azuredevops_project_name
 }
 
 # *********************************************************************************************** #
@@ -208,9 +206,10 @@ module "policies_factory_workspace" {
 
   vcs_repo = {
     # Azure DevOps VCS identifier format: <ado org>/<ado project>/_git/<ado repository>
-    identifier     = "${var.azuredevops_organization}/${var.azuredevops_project_id}/_git/${module.policies_factory_repository[0].repository.name}"
+    # Project name must be URL-encoded (spaces → %20) as required by the HCP Terraform provider.
+    identifier     = "${var.azuredevops_organization}/${replace(var.azuredevops_project_name, " ", "%20")}/_git/${module.policies_factory_repository[0].repository.name}"
     branch         = "main"
-    oauth_token_id = data.tfe_oauth_client.vcs.oauth_token_id
+    oauth_token_id = var.vcs_oauth_token_id
   }
 }
 
@@ -256,7 +255,7 @@ module "policies_factory_workspace" {
 
 module "policies_factory_team_hcp" {
   source       = "./modules/tfe_team"
-  count        = length(module.policies_factory_workspace) > 0 != null ? 1 : 0
+  count        = var.policies_factory_workspace_name != null ? 1 : 0
   name         = lower(replace("${module.policies_factory_workspace[0].workspace.name}-hcp", "/\\W|_|\\s/", "-"))
   organization = tfe_organization.this.name
   organization_access = {
@@ -333,8 +332,8 @@ resource "tfe_variable" "policies_factory" {
 
 module "policies_factory_repository" {
   source          = "./modules/azuredevops_repository"
-  count           = length(module.policies_factory_workspace) > 0 != null ? 1 : 0
-  project_id      = var.azuredevops_project_id
+  count           = var.policies_factory_workspace_name != null ? 1 : 0
+  project_id      = data.azuredevops_project.this.id
   name            = var.policies_factory_workspace_name
   branch_policies = var.policies_factory_branch_policies
 }
@@ -380,9 +379,10 @@ module "modules_factory_workspace" {
 
   vcs_repo = {
     # Azure DevOps VCS identifier format: <ado org>/<ado project>/_git/<ado repository>
-    identifier     = "${var.azuredevops_organization}/${var.azuredevops_project_id}/_git/${module.modules_factory_repository[0].repository.name}"
+    # Project name must be URL-encoded (spaces → %20) as required by the HCP Terraform provider.
+    identifier     = "${var.azuredevops_organization}/${replace(var.azuredevops_project_name, " ", "%20")}/_git/${module.modules_factory_repository[0].repository.name}"
     branch         = "main"
-    oauth_token_id = data.tfe_oauth_client.vcs.oauth_token_id
+    oauth_token_id = var.vcs_oauth_token_id
   }
 }
 
@@ -428,7 +428,7 @@ module "modules_factory_workspace" {
 
 module "modules_factory_team_hcp" {
   source       = "./modules/tfe_team"
-  count        = length(module.modules_factory_workspace) > 0 != null ? 1 : 0
+  count        = var.modules_factory_workspace_name != null ? 1 : 0
   name         = lower(replace("${module.modules_factory_workspace[0].workspace.name}-hcp", "/\\W|_|\\s/", "-"))
   organization = tfe_organization.this.name
   organization_access = {
@@ -540,8 +540,8 @@ resource "tfe_variable" "modules_factory_organization_name" {
 
 module "modules_factory_repository" {
   source          = "./modules/azuredevops_repository"
-  count           = length(module.modules_factory_workspace) > 0 != null ? 1 : 0
-  project_id      = var.azuredevops_project_id
+  count           = var.modules_factory_workspace_name != null ? 1 : 0
+  project_id      = data.azuredevops_project.this.id
   name            = var.modules_factory_workspace_name
   branch_policies = var.modules_factory_branch_policies
 }
@@ -562,13 +562,21 @@ module "projects_factory_workspace" {
   organization   = tfe_organization.this.name
   project_id     = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
   tags           = merge(var.projects_factory_tag, { managed_by_terraform = true })
+
+  vcs_repo = {
+    # Azure DevOps VCS identifier format: <ado org>/<ado project>/_git/<ado repository>
+    # Project name must be URL-encoded (spaces → %20) as required by the HCP Terraform provider.
+    identifier     = "${var.azuredevops_organization}/${replace(var.azuredevops_project_name, " ", "%20")}/_git/${module.projects_factory_repository[0].repository.name}"
+    branch         = "main"
+    oauth_token_id = var.vcs_oauth_token_id
+  }
 }
 
 # The following module blocks are used to create and manage the HCP Terraform teams required by the `projects factory`.
 
 module "projects_factory_team_hcp" {
   source       = "./modules/tfe_team"
-  count        = length(module.projects_factory_workspace) > 0 != null ? 1 : 0
+  count        = var.projects_factory_workspace_name != null ? 1 : 0
   name         = lower(replace("${module.projects_factory_workspace[0].workspace.name}-hcp", "/\\W|_|\\s/", "-"))
   organization = tfe_organization.this.name
   organization_access = {
@@ -583,7 +591,7 @@ module "projects_factory_team_hcp" {
 
 module "projects_factory_team_git" {
   source       = "./modules/tfe_team"
-  count        = length(module.projects_factory_workspace) > 0 != null ? 1 : 0
+  count        = var.projects_factory_workspace_name != null ? 1 : 0
   name         = lower(replace("${module.projects_factory_workspace[0].workspace.name}-git", "/\\W|_|\\s/", "-"))
   organization = tfe_organization.this.name
   organization_access = {
@@ -624,8 +632,8 @@ resource "tfe_variable" "projects_factory_organization_name" {
 
 module "projects_factory_repository" {
   source          = "./modules/azuredevops_repository"
-  count           = length(module.projects_factory_workspace) > 0 != null ? 1 : 0
-  project_id      = var.azuredevops_project_id
+  count           = var.projects_factory_workspace_name != null ? 1 : 0
+  project_id      = data.azuredevops_project.this.id
   name            = var.projects_factory_workspace_name
   branch_policies = var.projects_factory_branch_policies
 }
@@ -646,13 +654,21 @@ module "workspaces_factory_workspace" {
   organization   = tfe_organization.this.name
   project_id     = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
   tags           = merge(var.workspaces_factory_tag, { managed_by_terraform = true })
+
+  vcs_repo = {
+    # Azure DevOps VCS identifier format: <ado org>/<ado project>/_git/<ado repository>
+    # Project name must be URL-encoded (spaces → %20) as required by the HCP Terraform provider.
+    identifier     = "${var.azuredevops_organization}/${replace(var.azuredevops_project_name, " ", "%20")}/_git/${module.workspaces_factory_repository[0].repository.name}"
+    branch         = "main"
+    oauth_token_id = var.vcs_oauth_token_id
+  }
 }
 
 # The following module blocks are used to create and manage the HCP Terraform teams required by the `workspaces factory`.
 
 module "workspaces_factory_team_hcp" {
   source       = "./modules/tfe_team"
-  count        = length(module.workspaces_factory_workspace) > 0 != null ? 1 : 0
+  count        = var.workspaces_factory_workspace_name != null ? 1 : 0
   name         = lower(replace("${module.workspaces_factory_workspace[0].workspace.name}-hcp", "/\\W|_|\\s/", "-"))
   organization = tfe_organization.this.name
   organization_access = {
@@ -667,7 +683,7 @@ module "workspaces_factory_team_hcp" {
 
 module "workspaces_factory_team_git" {
   source       = "./modules/tfe_team"
-  count        = length(module.workspaces_factory_workspace) > 0 != null ? 1 : 0
+  count        = var.workspaces_factory_workspace_name != null ? 1 : 0
   name         = lower(replace("${module.workspaces_factory_workspace[0].workspace.name}-git", "/\\W|_|\\s/", "-"))
   organization = tfe_organization.this.name
   organization_access = {
@@ -708,8 +724,8 @@ resource "tfe_variable" "workspaces_factory_organization_name" {
 
 module "workspaces_factory_repository" {
   source          = "./modules/azuredevops_repository"
-  count           = length(module.workspaces_factory_workspace) > 0 != null ? 1 : 0
-  project_id      = var.azuredevops_project_id
+  count           = var.workspaces_factory_workspace_name != null ? 1 : 0
+  project_id      = data.azuredevops_project.this.id
   name            = var.workspaces_factory_workspace_name
   branch_policies = var.workspaces_factory_branch_policies
 }
@@ -730,13 +746,21 @@ module "repositories_factory_workspace" {
   organization   = tfe_organization.this.name
   project_id     = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
   tags           = merge(var.repositories_factory_tag, { managed_by_terraform = true })
+
+  vcs_repo = {
+    # Azure DevOps VCS identifier format: <ado org>/<ado project>/_git/<ado repository>
+    # Project name must be URL-encoded (spaces → %20) as required by the HCP Terraform provider.
+    identifier     = "${var.azuredevops_organization}/${replace(var.azuredevops_project_name, " ", "%20")}/_git/${module.repositories_factory_repository[0].repository.name}"
+    branch         = "main"
+    oauth_token_id = var.vcs_oauth_token_id
+  }
 }
 
 # The following module blocks are used to create and manage the HCP Terraform teams required by the `repositories factory`.
 
 module "repositories_factory_team_hcp" {
   source       = "./modules/tfe_team"
-  count        = length(module.repositories_factory_workspace) > 0 != null ? 1 : 0
+  count        = var.repositories_factory_workspace_name != null ? 1 : 0
   name         = lower(replace("${module.repositories_factory_workspace[0].workspace.name}-hcp", "/\\W|_|\\s/", "-"))
   organization = tfe_organization.this.name
   organization_access = {
@@ -748,7 +772,7 @@ module "repositories_factory_team_hcp" {
 
 module "repositories_factory_team_git" {
   source       = "./modules/tfe_team"
-  count        = length(module.repositories_factory_workspace) > 0 != null ? 1 : 0
+  count        = var.repositories_factory_workspace_name != null ? 1 : 0
   name         = lower(replace("${module.repositories_factory_workspace[0].workspace.name}-git", "/\\W|_|\\s/", "-"))
   organization = tfe_organization.this.name
   organization_access = {
@@ -789,8 +813,8 @@ resource "tfe_variable" "repositories_factory_organization_name" {
 
 module "repositories_factory_repository" {
   source          = "./modules/azuredevops_repository"
-  count           = length(module.repositories_factory_workspace) > 0 != null ? 1 : 0
-  project_id      = var.azuredevops_project_id
+  count           = var.repositories_factory_workspace_name != null ? 1 : 0
+  project_id      = data.azuredevops_project.this.id
   name            = var.repositories_factory_workspace_name
   branch_policies = var.repositories_factory_branch_policies
 }

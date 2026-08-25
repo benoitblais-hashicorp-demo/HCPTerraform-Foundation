@@ -26,7 +26,7 @@ to authenticate.
 - Create and manage HCP Terraform teams.
 - Manage team's organization access.
 - Manage team's members.
-- Generates a new team token and overrides existing token if one exists.
+- Generates a new team token with a 24-month expiration, automatically computed at apply time.
 - Manage team's permissions on a project.
 - Manage team's permissions on a workspace.
 
@@ -42,20 +42,23 @@ module "team" {
 }
 ```
 
-<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.13.0)
 
-- <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) (~> 0.78)
+- <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) (~> 0.79)
+
+- <a name="requirement_time"></a> [time](#requirement\_time) (~> 0.14)
 
 ## Providers
 
 The following providers are used by this module:
 
-- <a name="provider_tfe"></a> [tfe](#provider\_tfe) (~> 0.78)
+- <a name="provider_tfe"></a> [tfe](#provider\_tfe) (~> 0.79)
+
+- <a name="provider_time"></a> [time](#provider\_time) (~> 0.14)
 
 ## Modules
 
@@ -70,6 +73,7 @@ The following resources are used by this module:
 - [tfe_team_organization_members.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/team_organization_members) (resource)
 - [tfe_team_project_access.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/team_project_access) (resource)
 - [tfe_team_token.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/team_token) (resource)
+- [time_rotating.token_expiry](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/rotating) (resource)
 
 ## Required Inputs
 
@@ -223,7 +227,7 @@ Default: `null`
 
 ### <a name="input_token"></a> [token](#input\_token)
 
-Description: (Optional) If set to `true`, a team token will be generated.
+Description: (Optional) If set to `true`, a team token will be generated. The token expiration is automatically set to 24 months from the time of creation.
 
 Type: `bool`
 
@@ -232,14 +236,6 @@ Default: `false`
 ### <a name="input_token_description"></a> [token\_description](#input\_token\_description)
 
 Description: (Optional) The token's description, which must be unique per team. Required if creating multiple tokens for a single team.
-
-Type: `string`
-
-Default: `null`
-
-### <a name="input_token_expired_at"></a> [token\_expired\_at](#input\_token\_expired\_at)
-
-Description: (Optional) The token's expiration date. The expiration date must be a date/time string in RFC3339 format (e.g., '2024-12-31T23:59:59Z'). If no expiration date is supplied, the expiration date will default to null and never expire.
 
 Type: `string`
 
@@ -321,4 +317,3 @@ Description: The generated token.
 ### <a name="output_token_id"></a> [token\_id](#output\_token\_id)
 
 Description: The ID of the token.
-<!-- END_TF_DOCS -->

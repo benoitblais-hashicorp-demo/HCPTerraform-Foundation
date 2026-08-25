@@ -29,13 +29,18 @@ resource "tfe_team" "this" {
 
 }
 
+resource "time_rotating" "token_expiry" {
+  count            = var.token ? 1 : 0
+  rotation_months  = 24
+}
+
 resource "tfe_team_token" "this" {
 
   count = var.token ? 1 : 0
 
   team_id          = tfe_team.this.id
   description      = var.token_description
-  expired_at       = var.token_expired_at
+  expired_at       = time_rotating.token_expiry[0].rotation_rfc3339
   force_regenerate = var.token_force_regenerate
 
 }

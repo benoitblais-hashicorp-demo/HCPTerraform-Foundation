@@ -37,11 +37,10 @@ module "repository" {
   source     = "./modules/azuredevops_repository"
 
   name       = "my-repository"
-  project_id = "MyProject"
+  project_id = data.azuredevops_project.this.id  # Must be a UUID — use azuredevops_project data source to look up from a name
 }
 ```
 
-<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 The following requirements are needed by this module:
@@ -82,7 +81,7 @@ Type: `string`
 
 ### <a name="input_project_id"></a> [project\_id](#input\_project\_id)
 
-Description: (Required) The ID or name of the Azure DevOps project in which the repository will be created.
+Description: (Required) The UUID of the Azure DevOps project in which the repository will be created. Must be a UUID — use the `azuredevops_project` data source to resolve a project name to its UUID.
 
 Type: `string`
 
@@ -200,4 +199,3 @@ Description: SSH clone URL of the repository.
 ### <a name="output_web_url"></a> [web\_url](#output\_web\_url)
 
 Description: Web link to the repository.
-<!-- END_TF_DOCS -->

@@ -1,4 +1,3 @@
-<!-- BEGIN_TF_DOCS -->
 # HCP Terraform Foundation
 
 Code which manages configuration and life-cycle of all the HCP Terraform
@@ -14,13 +13,14 @@ To manage the resources from that code, provide a token from an account with
 `owner` permissions. Alternatively, you can use a token from the `owner` team
 instead of a user token.
 
-### GitHub Permissions
+### Azure DevOps Permissions
 
-To manage the GitHub resources, provide a token from an account or a GitHub App with
-appropriate permissions. It should have:
+To manage the Azure DevOps resources, provide a Personal Access Token (PAT) or
+configure a service principal with appropriate permissions. The identity must have:
 
-* Read access to `metadata`
-* Read and write access to `administration`, `code`, `secrets`, and `members`.
+* **Code**: Read & Write (to create and configure repositories)
+* **Project and Team**: Read (to read project information)
+* **Build**: Read & Execute (required for branch policies that reference build definitions)
 
 ## Authentication
 
@@ -36,27 +36,24 @@ input variable for the token.
 * Set the `TFE_TOKEN` environment variable. The provider can read the TFE\_TOKEN environment variable and the token stored there
 to authenticate.
 
-### GitHub Authentication
+### Azure DevOps Authentication
 
-The GitHub provider requires a GitHub token or GitHub App installation in order to manage resources.
+The Azure DevOps provider requires a Personal Access Token (PAT) or service principal credentials
+in order to manage resources.
 
-There are several ways to provide the required token:
+There are several ways to provide the required credentials:
 
-* Set the `token` argument in the provider configuration. You can set the `token` argument in the provider configuration. Use an
-input variable for the token.
-* Set the `GITHUB_TOKEN` environment variable. The provider can read the `GITHUB_TOKEN` environment variable and the token stored there
-to authenticate.
+* Set the `AZDO_ORG_SERVICE_URL` environment variable to your Azure DevOps organization URL
+  (e.g., `https://dev.azure.com/your-org`).
+* Set the `AZDO_PERSONAL_ACCESS_TOKEN` environment variable to authenticate with a PAT.
 
-There are several ways to provide the required GitHub App installation:
+Alternatively, for service principal (OIDC/client secret) authentication, set:
 
-* Set the `app_auth` argument in the provider configuration. You can set the app\_auth argument with the id, installation\_id and pem\_file
-in the provider configuration. The owner parameter is also required in this situation.
-* Set the `GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID` and `GITHUB_APP_PEM_FILE` environment variables. The provider can read the GITHUB\_APP\_ID,
-GITHUB\_APP\_INSTALLATION\_ID and GITHUB\_APP\_PEM\_FILE environment variables to authenticate.
+* `AZDO_CLIENT_ID` – the service principal client ID.
+* `AZDO_CLIENT_SECRET` or configure OIDC with `AZDO_TENANT_ID`.
 
-> Because strings with new lines is not support:</br>
-> use "\\\n" within the `pem_file` argument to replace new line</br>
-> use "\n" within the `GITHUB_APP_PEM_FILE` environment variables to replace new line</br>
+> **Note:** The PAT must be created with the scopes listed under **Azure DevOps Permissions** above.
+> Token TTL should be set according to your organization's security policy.
 
 ## Features
 
@@ -68,11 +65,14 @@ GITHUB\_APP\_INSTALLATION\_ID and GITHUB\_APP\_PEM\_FILE environment variables t
   * variables
   * notifications
   * run tasks
+* Manages Azure DevOps repository configuration:
+  * Git repositories (one per factory workspace)
+  * Branch policies (minimum reviewers, comment resolution, merge types, auto reviewers)
 
 ## Prerequisite
 
 In order to deploy the configuration from this code, you must first create
-an organization. You must then configure a [VCS Provider](https://github.com/benoitblais-hashicorp/HCPTerraform-Foundation/blob/main/docs/VCS-Provider.md)
+an organization. You must then configure a [VCS Provider](docs/VCS-Provider.md)
 before manually creating a dedicated VCS-driven workspace in the UI.
 
 To authenticate into HCP Terraform during configuration deployment, an
@@ -88,7 +88,16 @@ Currently, there are some HCP Terraform organization-level settings that are not
 2. **Recoverable Items (Data Retention Policy)**: Enabling or configuring the retention window for deleted (recoverable) workspaces, networks, or other items is not yet possible through Terraform.
 3. **IP Allow List (Inbound Allow List)**: Restricting inbound access to HCP Terraform workspaces and API endpoints to specific IP ranges must be done natively in the UI.
 
-## Documentation
+## External Documentation
+
+The following external documentation was used to develop this code:
+
+* [Terraform Documentation](https://developer.hashicorp.com/terraform/docs)
+* [HCP Terraform Provider Documentation](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs)
+* [Azure DevOps Terraform Provider Documentation](https://registry.terraform.io/providers/microsoft/azuredevops/latest/docs)
+* [Azure DevOps REST API — Git Repositories](https://docs.microsoft.com/en-us/rest/api/azure/devops/git/repositories?view=azure-devops-rest-7.0)
+* [Azure DevOps REST API — Policy Configurations](https://docs.microsoft.com/en-us/rest/api/azure/devops/policy/configurations?view=azure-devops-rest-7.0)
+* [Azure DevOps PAT Scopes](https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate)
 
 ## Requirements
 
@@ -96,9 +105,11 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.13.0)
 
-- <a name="requirement_github"></a> [github](#requirement\_github) (~> 6.13.0)
+- <a name="requirement_azuredevops"></a> [azuredevops](#requirement\_azuredevops) (~> 1.16)
 
 - <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) (~> 0.79)
+
+- <a name="requirement_time"></a> [time](#requirement\_time) (~> 0.14)
 
 ## Modules
 
@@ -108,167 +119,101 @@ The following Modules are called:
 
 Source: ./modules/tfe_agent
 
-Version:
-
-### <a name="module_modules_factory_git_teams"></a> [modules\_factory\_git\_teams](#module\_modules\_factory\_git\_teams)
-
-Source: ./modules/git_team
-
-Version:
-
-### <a name="module_modules_factory_repository"></a> [modules\_factory\_repository](#module\_modules\_factory\_repository)
-
-Source: ./modules/git_repository
-
-Version:
-
-### <a name="module_modules_factory_team_git"></a> [modules\_factory\_team\_git](#module\_modules\_factory\_team\_git)
+### <a name="module_teams"></a> [teams](#module\_teams)
 
 Source: ./modules/tfe_team
-
-Version:
-
-### <a name="module_modules_factory_team_hcp"></a> [modules\_factory\_team\_hcp](#module\_modules\_factory\_team\_hcp)
-
-Source: ./modules/tfe_team
-
-Version:
-
-### <a name="module_modules_factory_workspace"></a> [modules\_factory\_workspace](#module\_modules\_factory\_workspace)
-
-Source: ./modules/tfe_workspace
-
-Version:
-
-### <a name="module_policies_factory_git_teams"></a> [policies\_factory\_git\_teams](#module\_policies\_factory\_git\_teams)
-
-Source: ./modules/git_team
-
-Version:
-
-### <a name="module_policies_factory_repository"></a> [policies\_factory\_repository](#module\_policies\_factory\_repository)
-
-Source: ./modules/git_repository
-
-Version:
-
-### <a name="module_policies_factory_team_git"></a> [policies\_factory\_team\_git](#module\_policies\_factory\_team\_git)
-
-Source: ./modules/tfe_team
-
-Version:
-
-### <a name="module_policies_factory_team_hcp"></a> [policies\_factory\_team\_hcp](#module\_policies\_factory\_team\_hcp)
-
-Source: ./modules/tfe_team
-
-Version:
 
 ### <a name="module_policies_factory_workspace"></a> [policies\_factory\_workspace](#module\_policies\_factory\_workspace)
 
 Source: ./modules/tfe_workspace
 
-Version:
-
-### <a name="module_projects_factory_git_teams"></a> [projects\_factory\_git\_teams](#module\_projects\_factory\_git\_teams)
-
-Source: ./modules/git_team
-
-Version:
-
-### <a name="module_projects_factory_repository"></a> [projects\_factory\_repository](#module\_projects\_factory\_repository)
-
-Source: ./modules/git_repository
-
-Version:
-
-### <a name="module_projects_factory_team_git"></a> [projects\_factory\_team\_git](#module\_projects\_factory\_team\_git)
+### <a name="module_policies_factory_team_hcp"></a> [policies\_factory\_team\_hcp](#module\_policies\_factory\_team\_hcp)
 
 Source: ./modules/tfe_team
 
-Version:
+### <a name="module_policies_factory_repository"></a> [policies\_factory\_repository](#module\_policies\_factory\_repository)
 
-### <a name="module_projects_factory_team_hcp"></a> [projects\_factory\_team\_hcp](#module\_projects\_factory\_team\_hcp)
+Source: ./modules/azuredevops_repository
+
+### <a name="module_modules_factory_workspace"></a> [modules\_factory\_workspace](#module\_modules\_factory\_workspace)
+
+Source: ./modules/tfe_workspace
+
+### <a name="module_modules_factory_team_hcp"></a> [modules\_factory\_team\_hcp](#module\_modules\_factory\_team\_hcp)
 
 Source: ./modules/tfe_team
 
-Version:
+### <a name="module_modules_factory_team_git"></a> [modules\_factory\_team\_git](#module\_modules\_factory\_team\_git)
+
+Source: ./modules/tfe_team
+
+### <a name="module_modules_factory_repository"></a> [modules\_factory\_repository](#module\_modules\_factory\_repository)
+
+Source: ./modules/azuredevops_repository
 
 ### <a name="module_projects_factory_workspace"></a> [projects\_factory\_workspace](#module\_projects\_factory\_workspace)
 
 Source: ./modules/tfe_workspace
 
-Version:
-
-### <a name="module_repositories_factory_git_teams"></a> [repositories\_factory\_git\_teams](#module\_repositories\_factory\_git\_teams)
-
-Source: ./modules/git_team
-
-Version:
-
-### <a name="module_repositories_factory_repository"></a> [repositories\_factory\_repository](#module\_repositories\_factory\_repository)
-
-Source: ./modules/git_repository
-
-Version:
-
-### <a name="module_repositories_factory_team_git"></a> [repositories\_factory\_team\_git](#module\_repositories\_factory\_team\_git)
+### <a name="module_projects_factory_team_hcp"></a> [projects\_factory\_team\_hcp](#module\_projects\_factory\_team\_hcp)
 
 Source: ./modules/tfe_team
 
-Version:
-
-### <a name="module_repositories_factory_team_hcp"></a> [repositories\_factory\_team\_hcp](#module\_repositories\_factory\_team\_hcp)
+### <a name="module_projects_factory_team_git"></a> [projects\_factory\_team\_git](#module\_projects\_factory\_team\_git)
 
 Source: ./modules/tfe_team
 
-Version:
+### <a name="module_projects_factory_repository"></a> [projects\_factory\_repository](#module\_projects\_factory\_repository)
 
-### <a name="module_repositories_factory_workspace"></a> [repositories\_factory\_workspace](#module\_repositories\_factory\_workspace)
-
-Source: ./modules/tfe_workspace
-
-Version:
-
-### <a name="module_teams"></a> [teams](#module\_teams)
-
-Source: ./modules/tfe_team
-
-Version:
-
-### <a name="module_workspaces_factory_git_teams"></a> [workspaces\_factory\_git\_teams](#module\_workspaces\_factory\_git\_teams)
-
-Source: ./modules/git_team
-
-Version:
-
-### <a name="module_workspaces_factory_repository"></a> [workspaces\_factory\_repository](#module\_workspaces\_factory\_repository)
-
-Source: ./modules/git_repository
-
-Version:
-
-### <a name="module_workspaces_factory_team_git"></a> [workspaces\_factory\_team\_git](#module\_workspaces\_factory\_team\_git)
-
-Source: ./modules/tfe_team
-
-Version:
-
-### <a name="module_workspaces_factory_team_hcp"></a> [workspaces\_factory\_team\_hcp](#module\_workspaces\_factory\_team\_hcp)
-
-Source: ./modules/tfe_team
-
-Version:
+Source: ./modules/azuredevops_repository
 
 ### <a name="module_workspaces_factory_workspace"></a> [workspaces\_factory\_workspace](#module\_workspaces\_factory\_workspace)
 
 Source: ./modules/tfe_workspace
 
-Version:
+### <a name="module_workspaces_factory_team_hcp"></a> [workspaces\_factory\_team\_hcp](#module\_workspaces\_factory\_team\_hcp)
+
+Source: ./modules/tfe_team
+
+### <a name="module_workspaces_factory_team_git"></a> [workspaces\_factory\_team\_git](#module\_workspaces\_factory\_team\_git)
+
+Source: ./modules/tfe_team
+
+### <a name="module_workspaces_factory_repository"></a> [workspaces\_factory\_repository](#module\_workspaces\_factory\_repository)
+
+Source: ./modules/azuredevops_repository
+
+### <a name="module_repositories_factory_workspace"></a> [repositories\_factory\_workspace](#module\_repositories\_factory\_workspace)
+
+Source: ./modules/tfe_workspace
+
+### <a name="module_repositories_factory_team_hcp"></a> [repositories\_factory\_team\_hcp](#module\_repositories\_factory\_team\_hcp)
+
+Source: ./modules/tfe_team
+
+### <a name="module_repositories_factory_team_git"></a> [repositories\_factory\_team\_git](#module\_repositories\_factory\_team\_git)
+
+Source: ./modules/tfe_team
+
+### <a name="module_repositories_factory_repository"></a> [repositories\_factory\_repository](#module\_repositories\_factory\_repository)
+
+Source: ./modules/azuredevops_repository
 
 ## Required Inputs
 
 The following input variables are required:
+
+### <a name="input_azuredevops_organization"></a> [azuredevops\_organization](#input\_azuredevops\_organization)
+
+Description: (Required) The name of the Azure DevOps organization (the segment after `dev.azure.com/` in the URL). Used to build the VCS identifier for HCP Terraform workspaces.
+
+Type: `string`
+
+### <a name="input_azuredevops_project_name"></a> [azuredevops\_project\_name](#input\_azuredevops\_project\_name)
+
+Description: (Required) The name of the Azure DevOps project in which all factory repositories will be created. Used to look up the project UUID at plan time.
+
+Type: `string`
 
 ### <a name="input_organization_email"></a> [organization\_email](#input\_organization\_email)
 
@@ -279,6 +224,12 @@ Type: `string`
 ### <a name="input_organization_name"></a> [organization\_name](#input\_organization\_name)
 
 Description: (Required) Name of the organization.
+
+Type: `string`
+
+### <a name="input_vcs_oauth_token_id"></a> [vcs\_oauth\_token\_id](#input\_vcs\_oauth\_token\_id)
+
+Description: (Required) The OAuth Token ID of the HCP Terraform VCS Provider connection to use for VCS-driven workspaces. Find it in HCP Terraform UI: Organization Settings → VCS Providers → click the connection → the value starts with `ot-` (not `oc-`).
 
 Type: `string`
 
@@ -296,7 +247,7 @@ Default: `[]`
 
 ### <a name="input_aggregated_commit_status_enabled"></a> [aggregated\_commit\_status\_enabled](#input\_aggregated\_commit\_status\_enabled)
 
-Description: (Optional) Whether or not to enable Aggregated Status Checks. This can be useful for monorepo repositories with multiple workspaces receiving status checks for events such as a pull request. If enabled, send\_passing\_statuses\_for\_untriggered\_speculative\_plans needs to be false. Default to `true`.
+Description: (Optional) Whether or not to enable Aggregated Status Checks. If enabled, `send_passing_statuses_for_untriggered_speculative_plans` must be `false`. Default to `true`.
 
 Type: `bool`
 
@@ -304,7 +255,7 @@ Default: `true`
 
 ### <a name="input_allow_force_delete_workspaces"></a> [allow\_force\_delete\_workspaces](#input\_allow\_force\_delete\_workspaces)
 
-Description: (Optional) Whether workspace administrators are permitted to delete workspaces with resources under management. If false, only organization owners may delete these workspaces. Defaults to `false`.
+Description: (Optional) Whether workspace administrators are permitted to delete workspaces with resources under management. Defaults to `false`.
 
 Type: `bool`
 
@@ -312,7 +263,7 @@ Default: `false`
 
 ### <a name="input_assessments_enforced"></a> [assessments\_enforced](#input\_assessments\_enforced)
 
-Description: (Optional) Whether to force health assessments (drift detection) on all eligible workspaces or allow workspaces to set their own preferences. Default to `true`.
+Description: (Optional) Whether to force health assessments (drift detection) on all eligible workspaces. Default to `true`.
 
 Type: `bool`
 
@@ -336,7 +287,7 @@ Default: `true`
 
 ### <a name="input_default_execution_mode"></a> [default\_execution\_mode](#input\_default\_execution\_mode)
 
-Description:  (Optional) Which execution mode to use as the default for all workspaces in the organization. Valid values are `remote`, `local` or `agent`. Default to `remote`.
+Description: (Optional) Which execution mode to use as the default for all workspaces in the organization. Valid values are `remote`, `local` or `agent`. Default to `remote`.
 
 Type: `string`
 
@@ -344,7 +295,7 @@ Default: `"remote"`
 
 ### <a name="input_hcp_foundation_project_description"></a> [hcp\_foundation\_project\_description](#input\_hcp\_foundation\_project\_description)
 
-Description: (Optional) A description for the project in HCP Terraform.
+Description: (Optional) A description for the HCP Terraform Foundation project.
 
 Type: `string`
 
@@ -352,7 +303,7 @@ Default: `null`
 
 ### <a name="input_hcp_foundation_project_name"></a> [hcp\_foundation\_project\_name](#input\_hcp\_foundation\_project\_name)
 
-Description: (Optional) Name of the project in HCP Terraform.
+Description: (Optional) Name of the HCP Terraform Foundation project.
 
 Type: `string`
 
@@ -360,7 +311,7 @@ Default: `"HCP Terraform"`
 
 ### <a name="input_hcp_foundation_project_tags"></a> [hcp\_foundation\_project\_tags](#input\_hcp\_foundation\_project\_tags)
 
-Description: (Optional) A map of key-value tags to add to the project in HCP Terraform.
+Description: (Optional) A map of key-value tags to add to the HCP Terraform Foundation project.
 
 Type: `map(string)`
 
@@ -368,15 +319,23 @@ Default: `null`
 
 ### <a name="input_modules_factory_agent_pool_id"></a> [modules\_factory\_agent\_pool\_id](#input\_modules\_factory\_agent\_pool\_id)
 
-Description: (Optional) The ID of an agent pool to assign to the workspace for the `modules factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
+Description: (Optional) The ID of an agent pool for the `modules factory` workspace. Requires `execution_mode = "agent"`.
 
 Type: `string`
 
 Default: `null`
 
+### <a name="input_modules_factory_branch_policies"></a> [modules\_factory\_branch\_policies](#input\_modules\_factory\_branch\_policies)
+
+Description: (Optional) Branch policy configurations for the `modules factory` Azure DevOps repository.
+
+Type: See `modules/azuredevops_repository` variable `branch_policies`.
+
+Default: Protection on `refs/heads/main` with comment resolution, 1 required reviewer, squash and no-fast-forward merge strategies.
+
 ### <a name="input_modules_factory_description"></a> [modules\_factory\_description](#input\_modules\_factory\_description)
 
-Description: (Optional) A description for the workspacel for the `modules factory`.
+Description: (Optional) A description for the `modules factory` workspace.
 
 Type: `string`
 
@@ -384,44 +343,15 @@ Default: `"Code to provision and manage HCP Terraform modules using Terraform co
 
 ### <a name="input_modules_factory_execution_mode"></a> [modules\_factory\_execution\_mode](#input\_modules\_factory\_execution\_mode)
 
-Description: (Optional) Which execution mode to use for the `modules factory`. Using Terraform Cloud, valid values are `remote`, `local` or `agent`. When set to `local`, the workspace will be used for state storage only. Important: If you omit this attribute, the resource configures the workspace to use your organization's default execution mode (which in turn defaults to `remote`), removing any explicit value that might have previously been set for the workspace.
+Description: (Optional) Execution mode for the `modules factory` workspace. Valid values: `remote`, `local`, `agent`.
 
 Type: `string`
 
 Default: `null`
 
-### <a name="input_modules_factory_github_teams"></a> [modules\_factory\_github\_teams](#input\_modules\_factory\_github\_teams)
-
-Description:   (Optional) The modules\_factory\_github\_teams block supports the following:  
-    name        : (Required) The name of the team.  
-    description : (Optional) A description of the team.  
-    permission  : (Optional) The permissions of team members regarding the repository. Must be one of `pull`, `triage`, `push`, `maintain`, `admin` or the name of an existing custom repository role within the organisation.
-
-Type:
-
-```hcl
-list(object({
-    name        = string
-    description = optional(string)
-    permission  = optional(string, "pull")
-  }))
-```
-
-Default:
-
-```json
-[
-  {
-    "description": "This group grant write access to the HCP Terraform modules repository.",
-    "name": "HCPTerraform-ModulesFactory-Contributors",
-    "permission": "push"
-  }
-]
-```
-
 ### <a name="input_modules_factory_tag"></a> [modules\_factory\_tag](#input\_modules\_factory\_tag)
 
-Description: (Optional) A map of key value tags for this workspace for the `modules factory`.
+Description: (Optional) Tags for the `modules factory` workspace.
 
 Type: `map(string)`
 
@@ -429,7 +359,7 @@ Default: `null`
 
 ### <a name="input_modules_factory_workspace_name"></a> [modules\_factory\_workspace\_name](#input\_modules\_factory\_workspace\_name)
 
-Description: (Optional) Name of the workspace for the `modules factory`.
+Description: (Optional) Name of the `modules factory` workspace.
 
 Type: `string`
 
@@ -437,7 +367,7 @@ Default: `"HCPTerraform-ModulesFactory"`
 
 ### <a name="input_owners_team_saml_role_id"></a> [owners\_team\_saml\_role\_id](#input\_owners\_team\_saml\_role\_id)
 
-Description: (Optional) The name of the "owners" team.
+Description: (Optional) SAML role ID for the owners team.
 
 Type: `string`
 
@@ -445,15 +375,23 @@ Default: `null`
 
 ### <a name="input_policies_factory_agent_pool_id"></a> [policies\_factory\_agent\_pool\_id](#input\_policies\_factory\_agent\_pool\_id)
 
-Description: (Optional) The ID of an agent pool to assign to the workspace for the `policies factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
+Description: (Optional) The ID of an agent pool for the `policies factory` workspace. Requires `execution_mode = "agent"`.
 
 Type: `string`
 
 Default: `null`
 
+### <a name="input_policies_factory_branch_policies"></a> [policies\_factory\_branch\_policies](#input\_policies\_factory\_branch\_policies)
+
+Description: (Optional) Branch policy configurations for the `policies factory` Azure DevOps repository.
+
+Type: See `modules/azuredevops_repository` variable `branch_policies`.
+
+Default: Protection on `refs/heads/main` with comment resolution, 1 required reviewer, squash and no-fast-forward merge strategies.
+
 ### <a name="input_policies_factory_description"></a> [policies\_factory\_description](#input\_policies\_factory\_description)
 
-Description: (Optional) A description for the workspacel for the `policies factory`.
+Description: (Optional) A description for the `policies factory` workspace.
 
 Type: `string`
 
@@ -461,44 +399,15 @@ Default: `"Code to provision and manage HCP Terraform policies using Terraform c
 
 ### <a name="input_policies_factory_execution_mode"></a> [policies\_factory\_execution\_mode](#input\_policies\_factory\_execution\_mode)
 
-Description: (Optional) Which execution mode to use for the `policies factory`. Using Terraform Cloud, valid values are `remote`, `local` or `agent`. When set to `local`, the workspace will be used for state storage only. Important: If you omit this attribute, the resource configures the workspace to use your organization's default execution mode (which in turn defaults to `remote`), removing any explicit value that might have previously been set for the workspace.
+Description: (Optional) Execution mode for the `policies factory` workspace. Valid values: `remote`, `local`, `agent`.
 
 Type: `string`
 
 Default: `null`
 
-### <a name="input_policies_factory_github_teams"></a> [policies\_factory\_github\_teams](#input\_policies\_factory\_github\_teams)
-
-Description:   (Optional) The policies\_factory\_github\_teams block supports the following:  
-    name        : (Required) The name of the team.  
-    description : (Optional) A description of the team.  
-    permission  : (Optional) The permissions of team members regarding the repository. Must be one of `pull`, `triage`, `push`, `maintain`, `admin` or the name of an existing custom repository role within the organisation.
-
-Type:
-
-```hcl
-list(object({
-    name        = string
-    description = optional(string)
-    permission  = optional(string, "pull")
-  }))
-```
-
-Default:
-
-```json
-[
-  {
-    "description": "This group grant write access to the HCP Terraform Policies repository.",
-    "name": "HCPTerraform-Policies-Contributors",
-    "permission": "push"
-  }
-]
-```
-
 ### <a name="input_policies_factory_tag"></a> [policies\_factory\_tag](#input\_policies\_factory\_tag)
 
-Description: (Optional) A map of key value tags for this workspace for the `policies factory`.
+Description: (Optional) Tags for the `policies factory` workspace.
 
 Type: `map(string)`
 
@@ -506,7 +415,7 @@ Default: `null`
 
 ### <a name="input_policies_factory_workspace_name"></a> [policies\_factory\_workspace\_name](#input\_policies\_factory\_workspace\_name)
 
-Description: (Optional) Name of the workspace for the `policies factory`.
+Description: (Optional) Name of the `policies factory` workspace.
 
 Type: `string`
 
@@ -514,15 +423,23 @@ Default: `"HCPTerraform-PoliciesFactory"`
 
 ### <a name="input_projects_factory_agent_pool_id"></a> [projects\_factory\_agent\_pool\_id](#input\_projects\_factory\_agent\_pool\_id)
 
-Description: (Optional) The ID of an agent pool to assign to the workspace for the `projects factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
+Description: (Optional) The ID of an agent pool for the `projects factory` workspace. Requires `execution_mode = "agent"`.
 
 Type: `string`
 
 Default: `null`
 
+### <a name="input_projects_factory_branch_policies"></a> [projects\_factory\_branch\_policies](#input\_projects\_factory\_branch\_policies)
+
+Description: (Optional) Branch policy configurations for the `projects factory` Azure DevOps repository.
+
+Type: See `modules/azuredevops_repository` variable `branch_policies`.
+
+Default: Protection on `refs/heads/main` with comment resolution, 1 required reviewer, squash and no-fast-forward merge strategies.
+
 ### <a name="input_projects_factory_description"></a> [projects\_factory\_description](#input\_projects\_factory\_description)
 
-Description: (Optional) A description for the workspace for the `projects factory`.
+Description: (Optional) A description for the `projects factory` workspace.
 
 Type: `string`
 
@@ -530,44 +447,15 @@ Default: `"Code to provision and manage HCP Terraform projects using Terraform c
 
 ### <a name="input_projects_factory_execution_mode"></a> [projects\_factory\_execution\_mode](#input\_projects\_factory\_execution\_mode)
 
-Description: (Optional) Which execution mode to use for the `projects factory`. Using Terraform Cloud, valid values are `remote`, `local` or `agent`. When set to `local`, the workspace will be used for state storage only. Important: If you omit this attribute, the resource configures the workspace to use your organization's default execution mode (which in turn defaults to `remote`), removing any explicit value that might have previously been set for the workspace.
+Description: (Optional) Execution mode for the `projects factory` workspace. Valid values: `remote`, `local`, `agent`.
 
 Type: `string`
 
 Default: `null`
 
-### <a name="input_projects_factory_github_teams"></a> [projects\_factory\_github\_teams](#input\_projects\_factory\_github\_teams)
-
-Description:   (Optional) The projects\_factory\_github\_teams block supports the following:  
-    name        : (Required) The name of the team.  
-    description : (Optional) A description of the team.  
-    permission  : (Optional) The permissions of team members regarding the repository. Must be one of `pull`, `triage`, `push`, `maintain`, `admin` or the name of an existing custom repository role within the organisation.
-
-Type:
-
-```hcl
-list(object({
-    name        = string
-    description = optional(string)
-    permission  = optional(string, "pull")
-  }))
-```
-
-Default:
-
-```json
-[
-  {
-    "description": "This group grant write access to the HCP Terraform projects repository.",
-    "name": "HCPTerraform-ProjectsFactory-Contributors",
-    "permission": "push"
-  }
-]
-```
-
 ### <a name="input_projects_factory_tag"></a> [projects\_factory\_tag](#input\_projects\_factory\_tag)
 
-Description: (Optional) A map of key value tags for this workspace for the `projects factory`.
+Description: (Optional) Tags for the `projects factory` workspace.
 
 Type: `map(string)`
 
@@ -575,7 +463,7 @@ Default: `null`
 
 ### <a name="input_projects_factory_workspace_name"></a> [projects\_factory\_workspace\_name](#input\_projects\_factory\_workspace\_name)
 
-Description: (Optional) Name of the workspace for the `projects factory`.
+Description: (Optional) Name of the `projects factory` workspace.
 
 Type: `string`
 
@@ -583,60 +471,39 @@ Default: `"HCPTerraform-ProjectsFactory"`
 
 ### <a name="input_repositories_factory_agent_pool_id"></a> [repositories\_factory\_agent\_pool\_id](#input\_repositories\_factory\_agent\_pool\_id)
 
-Description: (Optional) The ID of an agent pool to assign to the workspace for the `repositories factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
+Description: (Optional) The ID of an agent pool for the `repositories factory` workspace. Requires `execution_mode = "agent"`.
 
 Type: `string`
 
 Default: `null`
+
+### <a name="input_repositories_factory_branch_policies"></a> [repositories\_factory\_branch\_policies](#input\_repositories\_factory\_branch\_policies)
+
+Description: (Optional) Branch policy configurations for the `repositories factory` Azure DevOps repository.
+
+Type: See `modules/azuredevops_repository` variable `branch_policies`.
+
+Default: Protection on `refs/heads/main` with comment resolution, 1 required reviewer, squash and no-fast-forward merge strategies.
 
 ### <a name="input_repositories_factory_description"></a> [repositories\_factory\_description](#input\_repositories\_factory\_description)
 
-Description: (Optional) A description for the workspace for the `repositories factory`.
+Description: (Optional) A description for the `repositories factory` workspace.
 
 Type: `string`
 
-Default: `"Code to provision and manage GitHub repositories using Terraform code (IaC)."`
+Default: `"Code to provision and manage Azure DevOps repositories using Terraform code (IaC)."`
 
 ### <a name="input_repositories_factory_execution_mode"></a> [repositories\_factory\_execution\_mode](#input\_repositories\_factory\_execution\_mode)
 
-Description: (Optional) Which execution mode to use for the `repositories factory`. Using Terraform Cloud, valid values are `remote`, `local` or `agent`. When set to `local`, the workspace will be used for state storage only. Important: If you omit this attribute, the resource configures the workspace to use your organization's default execution mode (which in turn defaults to `remote`), removing any explicit value that might have previously been set for the workspace.
+Description: (Optional) Execution mode for the `repositories factory` workspace. Valid values: `remote`, `local`, `agent`.
 
 Type: `string`
 
 Default: `null`
 
-### <a name="input_repositories_factory_github_teams"></a> [repositories\_factory\_github\_teams](#input\_repositories\_factory\_github\_teams)
-
-Description:   (Optional) The repositories\_factory\_github\_teams block supports the following:  
-    name        : (Required) The name of the team.  
-    description : (Optional) A description of the team.  
-    permission  : (Optional) The permissions of team members regarding the repository. Must be one of `pull`, `triage`, `push`, `maintain`, `admin` or the name of an existing custom repository role within the organisation.
-
-Type:
-
-```hcl
-list(object({
-    name        = string
-    description = optional(string)
-    permission  = optional(string, "pull")
-  }))
-```
-
-Default:
-
-```json
-[
-  {
-    "description": "This group grant write access to the HCP Terraform repositories repository.",
-    "name": "HCPTerraform-repositoriesFactory-Contributors",
-    "permission": "push"
-  }
-]
-```
-
 ### <a name="input_repositories_factory_tag"></a> [repositories\_factory\_tag](#input\_repositories\_factory\_tag)
 
-Description: (Optional) A map of key value tags for this workspace for the `repositories factory`.
+Description: (Optional) Tags for the `repositories factory` workspace.
 
 Type: `map(string)`
 
@@ -644,15 +511,15 @@ Default: `null`
 
 ### <a name="input_repositories_factory_workspace_name"></a> [repositories\_factory\_workspace\_name](#input\_repositories\_factory\_workspace\_name)
 
-Description: (Optional) Name of the workspace for the `repositories factory`.
+Description: (Optional) Name of the `repositories factory` workspace.
 
 Type: `string`
 
-Default: `"GitHub-RepositoriesFactory"`
+Default: `"AzureDevOps-RepositoriesFactory"`
 
 ### <a name="input_send_passing_statuses_for_untriggered_speculative_plans"></a> [send\_passing\_statuses\_for\_untriggered\_speculative\_plans](#input\_send\_passing\_statuses\_for\_untriggered\_speculative\_plans)
 
-Description: (Optional) Whether or not to send VCS status updates for untriggered speculative plans. This can be useful if large numbers of untriggered workspaces are exhausting request limits for connected version control service providers like GitHub. Defaults to `false`.
+Description: (Optional) Whether or not to send VCS status updates for untriggered speculative plans. Defaults to `false`.
 
 Type: `bool`
 
@@ -660,7 +527,7 @@ Default: `false`
 
 ### <a name="input_session_remember_minutes"></a> [session\_remember\_minutes](#input\_session\_remember\_minutes)
 
-Description: (Optional) Session expiration. Defaults to `20160`.
+Description: (Optional) Session expiration in minutes. Defaults to `20160`.
 
 Type: `number`
 
@@ -668,7 +535,7 @@ Default: `null`
 
 ### <a name="input_session_timeout_minutes"></a> [session\_timeout\_minutes](#input\_session\_timeout\_minutes)
 
-Description: (Optional) Session timeout after inactivity. Defaults to `20160`.
+Description: (Optional) Session timeout after inactivity in minutes. Defaults to `20160`.
 
 Type: `number`
 
@@ -676,7 +543,7 @@ Default: `null`
 
 ### <a name="input_speculative_plan_management_enabled"></a> [speculative\_plan\_management\_enabled](#input\_speculative\_plan\_management\_enabled)
 
-Description: (Optional) Whether or not to enable Speculative Plan Management. If true, pending VCS-triggered speculative plans from outdated commits will be cancelled if a newer commit is pushed to the same branch. default to `true`.
+Description: (Optional) Whether to cancel pending speculative plans when a newer commit is pushed. Default to `true`.
 
 Type: `bool`
 
@@ -692,29 +559,13 @@ Default: `true`
 
 ### <a name="input_teams"></a> [teams](#input\_teams)
 
-Description:   (Optional) The teams block supports the following:  
-    name                         : (Required) Name of the team.   
-    organization\_access          : (Optional) The organization\_access supports the following:  
-      access\_secret\_teams        : (Optional) Allow members access to secret teams up to the level of permissions granted by their team permissions setting.  
-      manage\_agent\_pools         : (Optional) Allow members to create, edit, and delete agent pools within their organization.  
-      manage\_membership          : (Optional) Allow members to add/remove users from the organization, and to add/remove users from visible teams.  
-      manage\_modules             : (Optional) Allow members to publish and delete modules in the organization's private registry.  
-      manage\_organization\_access : (Optional) Allow members to update the organization access settings of teams.  
-      manage\_policies            : (Optional) Allows members to create, edit, and delete the organization's Sentinel policies.  
-      manage\_policy\_overrides    : (Optional) Allows members to override soft-mandatory policy checks.  
-      manage\_projects            : (Optional) Allow members to create and administrate all projects within the organization.  
-      manage\_providers           : (Optional) Allow members to publish and delete providers in the organization's private registry.  
-      manage\_run\_tasks           : (Optional) Allow members to create, edit, and delete the organization's run tasks.  
-      manage\_teams               : (Optional) Allow members to create, update, and delete teams.  
-      manage\_vcs\_settings        : (Optional) Allows members to manage the organization's VCS Providers and SSH keys.  
-      manage\_workspaces          : (Optional) Allows members to create and administrate all workspaces within the organization.  
-      read\_projects              : (Optional) Allow members to view all projects within the organization. Requires read\_workspaces to be set to true.  
-      read\_workspaces            : (Optional) Allow members to view all workspaces in this organization.  
-    sso\_team\_id                  : (Optional) Unique Identifier to control team membership via SAML.  
-    token                        : (Optional) If set to `true`, a team token will be generated.  
-    token\_description            : (Optional) The token's description, which must be unique per team. Required if creating multiple tokens for a single team.  
-    token\_expired\_at             : (Optional) The token's expiration date. The expiration date must be a date/time string in RFC3339 format (e.g., '2024-12-31T23:59:59Z'). If no expiration date is supplied, the expiration date will default to null and never expire.  
-    token\_force\_regenerate       : (Optional) If set to `true`, a new token will be generated even if a token already exists. This will invalidate the existing token!  
+Description:   (Optional) The teams block supports the following:
+    name                         : (Required) Name of the team.
+    organization\_access          : (Optional) Organization-level access settings.
+    sso\_team\_id                  : (Optional) Unique Identifier to control team membership via SAML.
+    token                        : (Optional) If `true`, a team token is generated with a 24-month expiration (automatic).
+    token\_description            : (Optional) The token's description. Required if creating multiple tokens for a single team.
+    token\_force\_regenerate       : (Optional) If `true`, regenerates an existing token. This will invalidate the existing token!
     visibility                   : (Optional) The visibility of the team (`secret` or `organization`).
 
 Type:
@@ -742,7 +593,6 @@ list(object({
     sso_team_id            = optional(string)
     token                  = optional(bool, false)
     token_description      = optional(string)
-    token_expired_at       = optional(string)
     token_force_regenerate = optional(bool, false)
     visibility             = optional(string, "organization")
   }))
@@ -760,15 +610,23 @@ Default: `true`
 
 ### <a name="input_workspaces_factory_agent_pool_id"></a> [workspaces\_factory\_agent\_pool\_id](#input\_workspaces\_factory\_agent\_pool\_id)
 
-Description: (Optional) The ID of an agent pool to assign to the workspace for the `workspaces factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
+Description: (Optional) The ID of an agent pool for the `workspaces factory` workspace. Requires `execution_mode = "agent"`.
 
 Type: `string`
 
 Default: `null`
 
+### <a name="input_workspaces_factory_branch_policies"></a> [workspaces\_factory\_branch\_policies](#input\_workspaces\_factory\_branch\_policies)
+
+Description: (Optional) Branch policy configurations for the `workspaces factory` Azure DevOps repository.
+
+Type: See `modules/azuredevops_repository` variable `branch_policies`.
+
+Default: Protection on `refs/heads/main` with comment resolution, 1 required reviewer, squash and no-fast-forward merge strategies.
+
 ### <a name="input_workspaces_factory_description"></a> [workspaces\_factory\_description](#input\_workspaces\_factory\_description)
 
-Description: (Optional) A description for the workspace for the `workspaces factory`.
+Description: (Optional) A description for the `workspaces factory` workspace.
 
 Type: `string`
 
@@ -776,44 +634,15 @@ Default: `"Code to provision and manage HCP Terraform workspaces using Terraform
 
 ### <a name="input_workspaces_factory_execution_mode"></a> [workspaces\_factory\_execution\_mode](#input\_workspaces\_factory\_execution\_mode)
 
-Description: (Optional) Which execution mode to use for the `workspaces factory`. Using Terraform Cloud, valid values are `remote`, `local` or `agent`. When set to `local`, the workspace will be used for state storage only. Important: If you omit this attribute, the resource configures the workspace to use your organization's default execution mode (which in turn defaults to `remote`), removing any explicit value that might have previously been set for the workspace.
+Description: (Optional) Execution mode for the `workspaces factory` workspace. Valid values: `remote`, `local`, `agent`.
 
 Type: `string`
 
 Default: `null`
 
-### <a name="input_workspaces_factory_github_teams"></a> [workspaces\_factory\_github\_teams](#input\_workspaces\_factory\_github\_teams)
-
-Description:   (Optional) The workspaces\_factory\_github\_teams block supports the following:  
-    name        : (Required) The name of the team.  
-    description : (Optional) A description of the team.  
-    permission  : (Optional) The permissions of team members regarding the repository. Must be one of `pull`, `triage`, `push`, `maintain`, `admin` or the name of an existing custom repository role within the organisation.
-
-Type:
-
-```hcl
-list(object({
-    name        = string
-    description = optional(string)
-    permission  = optional(string, "pull")
-  }))
-```
-
-Default:
-
-```json
-[
-  {
-    "description": "This group grant write access to the HCP Terraform workspaces repository.",
-    "name": "HCPTerraform-workspacesFactory-Contributors",
-    "permission": "push"
-  }
-]
-```
-
 ### <a name="input_workspaces_factory_tag"></a> [workspaces\_factory\_tag](#input\_workspaces\_factory\_tag)
 
-Description: (Optional) A map of key value tags for this workspace for the `workspaces factory`.
+Description: (Optional) Tags for the `workspaces factory` workspace.
 
 Type: `map(string)`
 
@@ -821,33 +650,26 @@ Default: `null`
 
 ### <a name="input_workspaces_factory_workspace_name"></a> [workspaces\_factory\_workspace\_name](#input\_workspaces\_factory\_workspace\_name)
 
-Description: (Optional) Name of the workspace for the `workspaces factory`.
+Description: (Optional) Name of the `workspaces factory` workspace.
 
 Type: `string`
 
 Default: `"HCPTerraform-WorkspacesFactory"`
 
+## Data Sources
+
+The following data sources are used by this module:
+
+- [azuredevops_project.this](https://registry.terraform.io/providers/microsoft/azuredevops/latest/docs/data-sources/project) (data source) — looks up the Azure DevOps project UUID from `var.azuredevops_project_name`
+
 ## Resources
 
 The following resources are used by this module:
 
-- [github_actions_secret.modules_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
-- [github_actions_secret.policies_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
-- [github_actions_secret.projects_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
-- [github_actions_secret.repositories_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
-- [github_actions_secret.workspaces_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
 - [tfe_organization.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/organization) (resource)
 - [tfe_organization_default_settings.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/organization_default_settings) (resource)
 - [tfe_project.hcp_foundation](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/project) (resource)
-- [tfe_variable.modules_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
-- [tfe_variable.modules_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.policies_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
-- [tfe_variable.projects_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
-- [tfe_variable.projects_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
-- [tfe_variable.repositories_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
-- [tfe_variable.repositories_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
-- [tfe_variable.workspaces_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
-- [tfe_variable.workspaces_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 
 ## Outputs
 
@@ -858,4 +680,3 @@ The following outputs are exported:
 Description: List of Teams created
 
 <!-- markdownlint-enable -->
-<!-- END_TF_DOCS -->
