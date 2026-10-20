@@ -121,7 +121,6 @@ resource "tfe_project_notification_configuration" "hcp_foundation" {
   url_wo           = local.hcp_foundation_project_notification_configurations[each.key].url_wo
   url_wo_version   = local.hcp_foundation_project_notification_configurations[each.key].url_wo_version
   email_user_ids   = local.hcp_foundation_project_notification_configurations[each.key].email_users != null ? toset([for username in local.hcp_foundation_project_notification_configurations[each.key].email_users : data.tfe_organization_membership.hcp_foundation_notification[username].user_id]) : null
-  email_addresses  = local.hcp_foundation_project_notification_configurations[each.key].email_addresses
 
 }
 

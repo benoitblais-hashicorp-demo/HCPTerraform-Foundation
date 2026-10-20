@@ -81,8 +81,8 @@ created in the previously created workspace with the value of the generated toke
 
 ## Manual Configurations
 
-Currently, there are some HCP Terraform organization-level settings that are not fully exposed or supported by the `hashicorp/tfe` Terraform provider and must be configured manually via the HCP Terraform UI:
+Currently, there are some HCP Terraform settings that are not fully exposed or supported by the `hashicorp/tfe` Terraform provider and must be configured manually via the HCP Terraform UI:
 
-1. **Maximum Time To Live (TTL) for API Tokens**: You can configure a maximum TTL for user and team API tokens to enhance security. This must be set manually in your Organization Settings.
-2. **Recoverable Items (Data Retention Policy)**: Enabling or configuring the retention window for deleted (recoverable) workspaces, networks, or other items is not yet possible through Terraform.
-3. **IP Allow List (Inbound Allow List)**: Restricting inbound access to HCP Terraform workspaces and API endpoints to specific IP ranges must be done natively in the UI.
+1. **Recoverable Items (Data Retention Policy)**: Enabling or configuring the retention window for deleted (recoverable) workspaces, networks, or other items is not yet possible through Terraform.
+2. **IP Allow List (Inbound Allow List)**: Restricting inbound access to HCP Terraform workspaces and API endpoints to specific IP ranges must be done natively in the UI.
+3. **External Email Recipients (Project Notifications)**: Email notifications to recipients outside the organization are not yet configurable through Terraform, because email_addresses is only available on Terraform Enterprise. Only organization members (email_users) can be set in code. Add external recipients manually in the project's notification settings in the UI.

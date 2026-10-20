@@ -82,11 +82,11 @@ created in the previously created workspace with the value of the generated toke
 
 ## Manual Configurations
 
-Currently, there are some HCP Terraform organization-level settings that are not fully exposed or supported by the `hashicorp/tfe` Terraform provider and must be configured manually via the HCP Terraform UI:
+Currently, there are some HCP Terraform settings that are not fully exposed or supported by the `hashicorp/tfe` Terraform provider and must be configured manually via the HCP Terraform UI:
 
-1. **Maximum Time To Live (TTL) for API Tokens**: You can configure a maximum TTL for user and team API tokens to enhance security. This must be set manually in your Organization Settings.
-2. **Recoverable Items (Data Retention Policy)**: Enabling or configuring the retention window for deleted (recoverable) workspaces, networks, or other items is not yet possible through Terraform.
-3. **IP Allow List (Inbound Allow List)**: Restricting inbound access to HCP Terraform workspaces and API endpoints to specific IP ranges must be done natively in the UI.
+1. **Recoverable Items (Data Retention Policy)**: Enabling or configuring the retention window for deleted (recoverable) workspaces, networks, or other items is not yet possible through Terraform.
+2. **IP Allow List (Inbound Allow List)**: Restricting inbound access to HCP Terraform workspaces and API endpoints to specific IP ranges must be done natively in the UI.
+3. **External Email Recipients (Project Notifications)**: Email notifications to recipients outside the organization are not yet configurable through Terraform, because email\_addresses is only available on Terraform Enterprise. Only organization members (email\_users) can be set in code. Add external recipients manually in the project's notification settings in the UI.
 
 ## Documentation
 
@@ -395,8 +395,7 @@ Description:   (Optional) A list of notification configurations for the project 
     url              : (Optional) The HTTP or HTTPS URL where notification requests will be made. Required if `destination_type` is `generic`, `microsoft-teams`, or `slack`. Must not be provided if `destination_type` is `email`. Cannot be used with `url_wo`.  
     url\_wo           : (Optional) Write-only alternative to `url`. Never stored in the Terraform state. Cannot be used with `url`.  
     url\_wo\_version   : (Optional) Tracks the version of `url_wo`. Increment it to push a new `url_wo` value.  
-    email\_users      : (Optional) A list of usernames of organization members who will receive the notification. Their user IDs are retrieved automatically. Each user must be a member of the organization. Only valid when `destination_type` is `email`.  
-    email\_addresses  : (Optional) (Terraform Enterprise only) A list of external email addresses that will receive the notification. Only valid when `destination_type` is `email`.
+    email\_users      : (Optional) A list of usernames of organization members who will receive the notification. Their user IDs are retrieved automatically. Each user must be a member of the organization. Only valid when `destination_type` is `email`.
 
 Type:
 
@@ -413,27 +412,10 @@ list(object({
     url_wo           = optional(string)
     url_wo_version   = optional(number)
     email_users      = optional(set(string))
-    email_addresses  = optional(set(string))
   }))
 ```
 
-Default:
-
-```json
-[
-  {
-    "destination_type": "email",
-    "email_addresses": [
-      "benoit.blais@hashicorp.com"
-    ],
-    "enabled": true,
-    "name": "test-external-email",
-    "triggers": [
-      "run:errored"
-    ]
-  }
-]
-```
+Default: `[]`
 
 ### <a name="input_hcp_foundation_project_tags"></a> [hcp\_foundation\_project\_tags](#input\_hcp\_foundation\_project\_tags)
 
