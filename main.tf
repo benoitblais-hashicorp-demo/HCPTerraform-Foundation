@@ -92,6 +92,54 @@ resource "tfe_project" "hcp_foundation" {
   })
 }
 
+# The following code block is use to create and manage the notification configurations of the project where all the workspaces related to the foundation will be stored.
+
+locals {
+  hcp_foundation_project_notification_configurations = { for config in var.hcp_foundation_project_notification_configurations : config.name => config }
+  hcp_foundation_project_notification_usernames      = toset(nonsensitive(flatten([for config in var.hcp_foundation_project_notification_configurations : coalesce(config.email_users, [])])))
+}
+
+data "tfe_organization_membership" "hcp_foundation_notification" {
+  for_each     = length(tfe_project.hcp_foundation) > 0 ? local.hcp_foundation_project_notification_usernames : toset([])
+  organization = tfe_organization.this.name
+  username     = each.key
+}
+
+resource "tfe_project_notification_configuration" "hcp_foundation" {
+
+  for_each = length(tfe_project.hcp_foundation) > 0 ? toset(nonsensitive(keys(local.hcp_foundation_project_notification_configurations))) : toset([])
+
+  name             = each.key
+  destination_type = local.hcp_foundation_project_notification_configurations[each.key].destination_type
+  enabled          = local.hcp_foundation_project_notification_configurations[each.key].enabled
+  project_id       = tfe_project.hcp_foundation[0].id
+  token            = local.hcp_foundation_project_notification_configurations[each.key].token
+  token_wo         = local.hcp_foundation_project_notification_configurations[each.key].token_wo
+  token_wo_version = local.hcp_foundation_project_notification_configurations[each.key].token_wo_version
+  triggers         = local.hcp_foundation_project_notification_configurations[each.key].triggers
+  url              = local.hcp_foundation_project_notification_configurations[each.key].url
+  url_wo           = local.hcp_foundation_project_notification_configurations[each.key].url_wo
+  url_wo_version   = local.hcp_foundation_project_notification_configurations[each.key].url_wo_version
+  email_user_ids   = local.hcp_foundation_project_notification_configurations[each.key].email_users != null ? toset([for username in local.hcp_foundation_project_notification_configurations[each.key].email_users : data.tfe_organization_membership.hcp_foundation_notification[username].user_id]) : null
+  email_addresses  = local.hcp_foundation_project_notification_configurations[each.key].email_addresses
+
+}
+
+# The following code block is use to create and manage the agent pool dedicated to the project where all the workspaces related to the foundation are stored.
+
+resource "tfe_agent_pool" "hcp_foundation" {
+  count               = var.hcp_foundation_project_agent_pool_name != null && length(tfe_project.hcp_foundation) > 0 ? 1 : 0
+  name                = var.hcp_foundation_project_agent_pool_name
+  organization        = tfe_organization.this.name
+  organization_scoped = false
+}
+
+resource "tfe_agent_pool_allowed_projects" "hcp_foundation" {
+  count               = length(tfe_agent_pool.hcp_foundation) > 0 ? 1 : 0
+  agent_pool_id       = tfe_agent_pool.hcp_foundation[0].id
+  allowed_project_ids = [tfe_project.hcp_foundation[0].id]
+}
+
 # *********************************************************************************************** #
 #                                       Policies Factory                                          #
 # *********************************************************************************************** #
