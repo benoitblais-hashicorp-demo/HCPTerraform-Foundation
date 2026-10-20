@@ -244,7 +244,7 @@ resource "tfe_variable" "modules_factory" {
 resource "tfe_variable" "modules_factory_organization_name" {
   count        = length(module.modules_factory_team_hcp) > 0 ? 1 : 0
   key          = "organization_name"
-  value        = var.organization_name
+  value_wo     = var.organization_name
   category     = "terraform"
   description  = "(Required) Name of the organization."
   sensitive    = false
@@ -348,7 +348,7 @@ resource "tfe_variable" "projects_factory" {
 resource "tfe_variable" "projects_factory_organization_name" {
   count        = length(module.projects_factory_team_hcp) > 0 ? 1 : 0
   key          = "organization_name"
-  value        = var.organization_name
+  value_wo     = var.organization_name
   category     = "terraform"
   description  = "(Required) Name of the organization."
   sensitive    = false
@@ -452,7 +452,7 @@ resource "tfe_variable" "workspaces_factory" {
 resource "tfe_variable" "workspaces_factory_organization_name" {
   count        = length(module.workspaces_factory_team_hcp) > 0 ? 1 : 0
   key          = "organization_name"
-  value        = var.organization_name
+  value_wo     = var.organization_name
   category     = "terraform"
   description  = "(Required) Name of the organization."
   sensitive    = false
@@ -553,7 +553,7 @@ resource "tfe_variable" "repositories_factory" {
 resource "tfe_variable" "repositories_factory_organization_name" {
   count        = length(module.repositories_factory_team_hcp) > 0 ? 1 : 0
   key          = "organization_name"
-  value        = var.organization_name
+  value_wo     = var.organization_name
   category     = "terraform"
   description  = "(Required) Name of the organization."
   sensitive    = false
