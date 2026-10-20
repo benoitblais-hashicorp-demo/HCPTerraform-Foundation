@@ -91,6 +91,13 @@ variable "enforce_hyok" {
   default     = false
 }
 
+variable "hcp_foundation_project_agent_pool_name" {
+  description = "(Optional) Name of the agent pool to create for the project in HCP Terraform. The agent pool is only created if the project is created and this variable is set. The agent pool is scoped to the project only."
+  type        = string
+  nullable    = true
+  default     = null
+}
+
 variable "hcp_foundation_project_description" {
   description = "(Optional) A description for the project in HCP Terraform."
   type        = string
@@ -105,11 +112,71 @@ variable "hcp_foundation_project_name" {
   default     = "HCP Terraform"
 }
 
+variable "hcp_foundation_project_notification_configurations" {
+  description = <<EOT
+  (Optional) A list of notification configurations for the project in HCP Terraform. A project can have up to 20 notification configurations, and they apply to all runs of all workspaces within the project.
+    name             : (Required) Name of the project notification configuration. Must be unique within the list.
+    destination_type : (Required) The type of notification configuration payload to send. Valid values are `generic`, `email`, `slack`, and `microsoft-teams`.
+    enabled          : (Optional) Whether the project notification configuration should be enabled or not. Disabled configurations will not send any notifications. Defaults to `false`.
+    token            : (Optional) A secure token which can be used by the receiving server to verify request authenticity. Only valid when `destination_type` is `generic`. Cannot be used with `token_wo`.
+    token_wo         : (Optional) Write-only alternative to `token`. Never stored in the Terraform state. Only valid when `destination_type` is `generic`. Cannot be used with `token`.
+    token_wo_version : (Optional) Tracks the version of `token_wo`. Increment it to push a new `token_wo` value. Cannot be used with `token`.
+    triggers         : (Optional) The list of triggers for which this notification configuration will send notifications. Valid values are `run:created`, `run:planning`, `run:needs_attention`, `run:pending_apply_approval`, `run:cost_estimated`, `run:policy_override_required`, `run:policies_checked`, `run:applying`, `run:completed`, `run:errored`, `run:run_errored`, `run:run_canceled`, `run:policy_soft_failed`, `assessment:check_failure`, `assessment:drifted`, `assessment:failed`, `workspace:auto_destroy_reminder`, or `workspace:auto_destroy_run_results`.
+    url              : (Optional) The HTTP or HTTPS URL where notification requests will be made. Required if `destination_type` is `generic`, `microsoft-teams`, or `slack`. Must not be provided if `destination_type` is `email`. Cannot be used with `url_wo`.
+    url_wo           : (Optional) Write-only alternative to `url`. Never stored in the Terraform state. Cannot be used with `url`.
+    url_wo_version   : (Optional) Tracks the version of `url_wo`. Increment it to push a new `url_wo` value.
+    email_users      : (Optional) A list of usernames of organization members who will receive the notification. Their user IDs are retrieved automatically. Each user must be a member of the organization. Only valid when `destination_type` is `email`.
+    email_addresses  : (Optional) (Terraform Enterprise only) A list of external email addresses that will receive the notification. Only valid when `destination_type` is `email`.
+  EOT
+  type = list(object({
+    name             = string
+    destination_type = string
+    enabled          = optional(bool, false)
+    token            = optional(string)
+    token_wo         = optional(string)
+    token_wo_version = optional(number)
+    triggers         = optional(set(string))
+    url              = optional(string)
+    url_wo           = optional(string)
+    url_wo_version   = optional(number)
+    email_users      = optional(set(string))
+    email_addresses  = optional(set(string))
+  }))
+  sensitive = true
+  nullable  = false
+  default = [
+    {
+      name             = "test-external-email"
+      destination_type = "email"
+      enabled          = true
+      triggers         = ["run:errored"]
+      email_addresses  = ["benoit.blais@hashicorp.com"]
+    }
+  ]
+
+  validation {
+    condition     = length([for config in var.hcp_foundation_project_notification_configurations : config.destination_type if contains(["generic", "email", "slack", "microsoft-teams"], config.destination_type)]) == length(var.hcp_foundation_project_notification_configurations)
+    error_message = "Valid values for `destination_type` are \"generic\", \"email\", \"slack\", or \"microsoft-teams\"."
+  }
+
+  validation {
+    condition     = length(distinct([for config in var.hcp_foundation_project_notification_configurations : config.name])) == length(var.hcp_foundation_project_notification_configurations)
+    error_message = "Each notification configuration must have a unique `name`."
+  }
+
+  validation {
+    condition     = length(var.hcp_foundation_project_notification_configurations) <= 20
+    error_message = "A project can have up to 20 notification configurations."
+  }
+}
+
 variable "hcp_foundation_project_tags" {
   description = "(Optional) A map of key-value tags to add to the project in HCP Terraform."
   type        = map(string)
   nullable    = true
-  default     = null
+  default = {
+    environment = "production"
+  }
 }
 
 variable "max_ttl_enabled" {

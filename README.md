@@ -358,6 +358,14 @@ Type: `bool`
 
 Default: `false`
 
+### <a name="input_hcp_foundation_project_agent_pool_name"></a> [hcp\_foundation\_project\_agent\_pool\_name](#input\_hcp\_foundation\_project\_agent\_pool\_name)
+
+Description: (Optional) Name of the agent pool to create for the project in HCP Terraform. The agent pool is only created if the project is created and this variable is set. The agent pool is scoped to the project only.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_hcp_foundation_project_description"></a> [hcp\_foundation\_project\_description](#input\_hcp\_foundation\_project\_description)
 
 Description: (Optional) A description for the project in HCP Terraform.
@@ -374,13 +382,72 @@ Type: `string`
 
 Default: `"HCP Terraform"`
 
+### <a name="input_hcp_foundation_project_notification_configurations"></a> [hcp\_foundation\_project\_notification\_configurations](#input\_hcp\_foundation\_project\_notification\_configurations)
+
+Description:   (Optional) A list of notification configurations for the project in HCP Terraform. A project can have up to 20 notification configurations, and they apply to all runs of all workspaces within the project.  
+    name             : (Required) Name of the project notification configuration. Must be unique within the list.  
+    destination\_type : (Required) The type of notification configuration payload to send. Valid values are `generic`, `email`, `slack`, and `microsoft-teams`.  
+    enabled          : (Optional) Whether the project notification configuration should be enabled or not. Disabled configurations will not send any notifications. Defaults to `false`.  
+    token            : (Optional) A secure token which can be used by the receiving server to verify request authenticity. Only valid when `destination_type` is `generic`. Cannot be used with `token_wo`.  
+    token\_wo         : (Optional) Write-only alternative to `token`. Never stored in the Terraform state. Only valid when `destination_type` is `generic`. Cannot be used with `token`.  
+    token\_wo\_version : (Optional) Tracks the version of `token_wo`. Increment it to push a new `token_wo` value. Cannot be used with `token`.  
+    triggers         : (Optional) The list of triggers for which this notification configuration will send notifications. Valid values are `run:created`, `run:planning`, `run:needs_attention`, `run:pending_apply_approval`, `run:cost_estimated`, `run:policy_override_required`, `run:policies_checked`, `run:applying`, `run:completed`, `run:errored`, `run:run_errored`, `run:run_canceled`, `run:policy_soft_failed`, `assessment:check_failure`, `assessment:drifted`, `assessment:failed`, `workspace:auto_destroy_reminder`, or `workspace:auto_destroy_run_results`.  
+    url              : (Optional) The HTTP or HTTPS URL where notification requests will be made. Required if `destination_type` is `generic`, `microsoft-teams`, or `slack`. Must not be provided if `destination_type` is `email`. Cannot be used with `url_wo`.  
+    url\_wo           : (Optional) Write-only alternative to `url`. Never stored in the Terraform state. Cannot be used with `url`.  
+    url\_wo\_version   : (Optional) Tracks the version of `url_wo`. Increment it to push a new `url_wo` value.  
+    email\_users      : (Optional) A list of usernames of organization members who will receive the notification. Their user IDs are retrieved automatically. Each user must be a member of the organization. Only valid when `destination_type` is `email`.  
+    email\_addresses  : (Optional) (Terraform Enterprise only) A list of external email addresses that will receive the notification. Only valid when `destination_type` is `email`.
+
+Type:
+
+```hcl
+list(object({
+    name             = string
+    destination_type = string
+    enabled          = optional(bool, false)
+    token            = optional(string)
+    token_wo         = optional(string)
+    token_wo_version = optional(number)
+    triggers         = optional(set(string))
+    url              = optional(string)
+    url_wo           = optional(string)
+    url_wo_version   = optional(number)
+    email_users      = optional(set(string))
+    email_addresses  = optional(set(string))
+  }))
+```
+
+Default:
+
+```json
+[
+  {
+    "destination_type": "email",
+    "email_addresses": [
+      "benoit.blais@hashicorp.com"
+    ],
+    "enabled": true,
+    "name": "test-external-email",
+    "triggers": [
+      "run:errored"
+    ]
+  }
+]
+```
+
 ### <a name="input_hcp_foundation_project_tags"></a> [hcp\_foundation\_project\_tags](#input\_hcp\_foundation\_project\_tags)
 
 Description: (Optional) A map of key-value tags to add to the project in HCP Terraform.
 
 Type: `map(string)`
 
-Default: `null`
+Default:
+
+```json
+{
+  "environment": "production"
+}
+```
 
 ### <a name="input_max_ttl_enabled"></a> [max\_ttl\_enabled](#input\_max\_ttl\_enabled)
 
@@ -888,10 +955,13 @@ The following resources are used by this module:
 - [github_actions_secret.projects_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
 - [github_actions_secret.repositories_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
 - [github_actions_secret.workspaces_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
+- [tfe_agent_pool.hcp_foundation](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/agent_pool) (resource)
+- [tfe_agent_pool_allowed_projects.hcp_foundation](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/agent_pool_allowed_projects) (resource)
 - [tfe_org_max_token_ttl_policy.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/org_max_token_ttl_policy) (resource)
 - [tfe_organization.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/organization) (resource)
 - [tfe_organization_default_settings.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/organization_default_settings) (resource)
 - [tfe_project.hcp_foundation](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/project) (resource)
+- [tfe_project_notification_configuration.hcp_foundation](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/project_notification_configuration) (resource)
 - [tfe_variable.modules_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.modules_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.policies_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
@@ -901,6 +971,7 @@ The following resources are used by this module:
 - [tfe_variable.repositories_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.workspaces_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.workspaces_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+- [tfe_organization_membership.hcp_foundation_notification](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/data-sources/organization_membership) (data source)
 
 ## Outputs
 
