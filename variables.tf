@@ -126,7 +126,6 @@ variable "hcp_foundation_project_notification_configurations" {
     url_wo           : (Optional) Write-only alternative to `url`. Never stored in the Terraform state. Cannot be used with `url`.
     url_wo_version   : (Optional) Tracks the version of `url_wo`. Increment it to push a new `url_wo` value.
     email_users      : (Optional) A list of usernames of organization members who will receive the notification. Their user IDs are retrieved automatically. Each user must be a member of the organization. Only valid when `destination_type` is `email`.
-    email_addresses  : (Optional) (Terraform Enterprise only) A list of external email addresses that will receive the notification. Only valid when `destination_type` is `email`.
   EOT
   type = list(object({
     name             = string
@@ -140,19 +139,10 @@ variable "hcp_foundation_project_notification_configurations" {
     url_wo           = optional(string)
     url_wo_version   = optional(number)
     email_users      = optional(set(string))
-    email_addresses  = optional(set(string))
   }))
   sensitive = true
   nullable  = false
-  default = [
-    {
-      name             = "test-external-email"
-      destination_type = "email"
-      enabled          = true
-      triggers         = ["run:errored"]
-      email_addresses  = ["benoit.blais@hashicorp.com"]
-    }
-  ]
+  default   = []
 
   validation {
     condition     = length([for config in var.hcp_foundation_project_notification_configurations : config.destination_type if contains(["generic", "email", "slack", "microsoft-teams"], config.destination_type)]) == length(var.hcp_foundation_project_notification_configurations)
