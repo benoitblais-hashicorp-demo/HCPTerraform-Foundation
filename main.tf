@@ -140,7 +140,7 @@ module "policies_factory_team_git" {
 resource "tfe_variable" "policies_factory" {
   count        = length(module.policies_factory_team_hcp) > 0 ? 1 : 0
   key          = "TFE_TOKEN"
-  value        = module.policies_factory_team_hcp[0].token
+  value_wo     = module.policies_factory_team_hcp[0].token
   category     = "env"
   sensitive    = true
   workspace_id = module.policies_factory_workspace[0].id
@@ -233,7 +233,7 @@ module "modules_factory_team_git" {
 resource "tfe_variable" "modules_factory" {
   count        = length(module.modules_factory_team_hcp) > 0 ? 1 : 0
   key          = "TFE_TOKEN"
-  value        = module.modules_factory_team_hcp[0].token
+  value_wo     = module.modules_factory_team_hcp[0].token
   category     = "env"
   sensitive    = true
   workspace_id = module.modules_factory_workspace[0].id
@@ -244,7 +244,7 @@ resource "tfe_variable" "modules_factory" {
 resource "tfe_variable" "modules_factory_organization_name" {
   count        = length(module.modules_factory_team_hcp) > 0 ? 1 : 0
   key          = "organization_name"
-  value        = var.organization_name
+  value_wo     = var.organization_name
   category     = "terraform"
   description  = "(Required) Name of the organization."
   sensitive    = false
@@ -337,7 +337,7 @@ module "projects_factory_team_git" {
 resource "tfe_variable" "projects_factory" {
   count        = length(module.projects_factory_team_hcp) > 0 ? 1 : 0
   key          = "TFE_TOKEN"
-  value        = module.projects_factory_team_hcp[0].token
+  value_wo     = module.projects_factory_team_hcp[0].token
   category     = "env"
   sensitive    = true
   workspace_id = module.projects_factory_workspace[0].id
@@ -348,7 +348,7 @@ resource "tfe_variable" "projects_factory" {
 resource "tfe_variable" "projects_factory_organization_name" {
   count        = length(module.projects_factory_team_hcp) > 0 ? 1 : 0
   key          = "organization_name"
-  value        = var.organization_name
+  value_wo     = var.organization_name
   category     = "terraform"
   description  = "(Required) Name of the organization."
   sensitive    = false
@@ -441,7 +441,7 @@ module "workspaces_factory_team_git" {
 resource "tfe_variable" "workspaces_factory" {
   count        = length(module.workspaces_factory_team_hcp) > 0 ? 1 : 0
   key          = "TFE_TOKEN"
-  value        = module.workspaces_factory_team_hcp[0].token
+  value_wo     = module.workspaces_factory_team_hcp[0].token
   category     = "env"
   sensitive    = true
   workspace_id = module.workspaces_factory_workspace[0].id
@@ -452,7 +452,7 @@ resource "tfe_variable" "workspaces_factory" {
 resource "tfe_variable" "workspaces_factory_organization_name" {
   count        = length(module.workspaces_factory_team_hcp) > 0 ? 1 : 0
   key          = "organization_name"
-  value        = var.organization_name
+  value_wo     = var.organization_name
   category     = "terraform"
   description  = "(Required) Name of the organization."
   sensitive    = false
@@ -542,7 +542,7 @@ module "repositories_factory_team_git" {
 resource "tfe_variable" "repositories_factory" {
   count        = length(module.repositories_factory_team_hcp) > 0 ? 1 : 0
   key          = "TFE_TOKEN"
-  value        = module.repositories_factory_team_hcp[0].token
+  value_wo     = module.repositories_factory_team_hcp[0].token
   category     = "env"
   sensitive    = true
   workspace_id = module.repositories_factory_workspace[0].id
@@ -553,7 +553,7 @@ resource "tfe_variable" "repositories_factory" {
 resource "tfe_variable" "repositories_factory_organization_name" {
   count        = length(module.repositories_factory_team_hcp) > 0 ? 1 : 0
   key          = "organization_name"
-  value        = var.organization_name
+  value_wo     = var.organization_name
   category     = "terraform"
   description  = "(Required) Name of the organization."
   sensitive    = false
