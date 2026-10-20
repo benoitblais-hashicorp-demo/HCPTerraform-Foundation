@@ -576,8 +576,8 @@ variable "teams" {
     sso_team_id                  : (Optional) Unique Identifier to control team membership via SAML.
     token                        : (Optional) If set to `true`, a team token will be generated.
     token_description            : (Optional) The token's description, which must be unique per team. Required if creating multiple tokens for a single team.
-    token_expired_at             : (Optional) The token's expiration date. The expiration date must be a date/time string in RFC3339 format (e.g., '2024-12-31T23:59:59Z'). If no expiration date is supplied, the expiration date will default to null and never expire.
     token_force_regenerate       : (Optional) If set to `true`, a new token will be generated even if a token already exists. This will invalidate the existing token!
+    token_rotation_days          : (Optional) Number of days after which the team token will be automatically rotated. Defaults to `365`.
     visibility                   : (Optional) The visibility of the team (`secret` or `organization`).
   EOT
   type = list(object({
@@ -604,8 +604,8 @@ variable "teams" {
     sso_team_id            = optional(string)
     token                  = optional(bool, false)
     token_description      = optional(string)
-    token_expired_at       = optional(string)
     token_force_regenerate = optional(bool, false)
+    token_rotation_days    = optional(number, 365)
     visibility             = optional(string, "organization")
   }))
   nullable = false
@@ -625,10 +625,12 @@ variable "teams" {
     condition     = length([for team in var.teams : team.organization_access != null ? team.organization_access.manage_projects == true && team.organization_access.manage_workspaces != true ? false : true : true]) == length(var.teams)
     error_message = "`manage_projects` requires `manage_workspaces` to be set to `true`."
   }
+
   validation {
-    condition     = length([for team in var.teams : team.token_expired_at != null ? length(regexall("^((?:(\\d{4}-\\d{2}-\\d{2})T(\\d{2}:\\d{2}:\\d{2}))Z)$", team.token_expired_at)) > 0 ? true : false : true]) == length(var.teams)
-    error_message = "The expiration date must be a date/time string in RFC3339 format (e.g., '2024-12-31T23:59:59Z')."
+    condition     = length([for team in var.teams : team.token_rotation_days != null ? team.token_rotation_days > 0 : true]) == length(var.teams)
+    error_message = "`token_rotation_days` must be a positive number of days."
   }
+
   validation {
     condition     = length([for team in var.teams : contains(["secret", "organization"], team.visibility)]) == length(var.teams)
     error_message = "Valid values for `visibility` is \"secret\" or \"organization\"."
