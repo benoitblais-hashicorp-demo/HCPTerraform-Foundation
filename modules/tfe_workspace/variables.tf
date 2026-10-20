@@ -85,12 +85,6 @@ variable "remote_state_consumer_ids" {
   default     = []
 }
 
-variable "source_name" {
-  description = "(Optional) A friendly name for the application or client creating this workspace. If set, this will be displayed on the workspace as 'Created via '. Requires `source_url` to also be set."
-  type        = string
-  default     = null
-}
-
 variable "run_tasks" {
   description = <<EOT
   (Optional) A list of run tasks to be executed on the workspace.
@@ -120,6 +114,12 @@ variable "run_tasks" {
     ])
     error_message = "Valid values for `stages` are \"pre_plan\", \"post_plan\", \"pre_apply\", and \"post_apply\"."
   }
+}
+
+variable "source_name" {
+  description = "(Optional) A friendly name for the application or client creating this workspace. If set, this will be displayed on the workspace as 'Created via '. Requires `source_url` to also be set."
+  type        = string
+  default     = null
 }
 
 variable "source_url" {

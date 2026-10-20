@@ -1,13 +1,15 @@
 resource "tfe_team" "this" {
 
-  name         = var.name
-  sso_team_id  = var.sso_team_id
-  organization = var.organization
+  name                          = var.name
+  allow_member_token_management = var.allow_member_token_management
+  sso_team_id                   = var.sso_team_id
+  organization                  = var.organization
 
   dynamic "organization_access" {
     for_each = var.organization_access != null ? [true] : []
     content {
       access_secret_teams        = var.organization_access.access_secret_teams
+      delegate_policy_overrides  = var.organization_access.delegate_policy_overrides
       manage_agent_pools         = var.organization_access.manage_agent_pools
       manage_membership          = var.organization_access.manage_membership
       manage_modules             = var.organization_access.manage_modules
@@ -58,8 +60,9 @@ resource "tfe_team_project_access" "this" {
   dynamic "project_access" {
     for_each = var.custom_project_access != null ? [true] : []
     content {
-      settings = var.custom_project_access.settings
-      teams    = var.custom_project_access.teams
+      settings      = var.custom_project_access.settings
+      teams         = var.custom_project_access.teams
+      variable_sets = var.custom_project_access.variable_sets
     }
   }
 
@@ -69,15 +72,16 @@ resource "tfe_team_project_access" "this" {
   dynamic "workspace_access" {
     for_each = var.custom_workspace_access != null ? [true] : []
     content {
-      create         = var.custom_workspace_access.create
-      delete         = var.custom_workspace_access.delete
-      locking        = var.custom_workspace_access.locking
-      move           = var.custom_workspace_access.move
-      runs           = var.custom_workspace_access.runs
-      run_tasks      = var.custom_workspace_access.run_tasks
-      sentinel_mocks = var.custom_workspace_access.sentinel_mocks
-      state_versions = var.custom_workspace_access.state_versions
-      variables      = var.custom_workspace_access.variables
+      create           = var.custom_workspace_access.create
+      delete           = var.custom_workspace_access.delete
+      locking          = var.custom_workspace_access.locking
+      move             = var.custom_workspace_access.move
+      policy_overrides = var.custom_workspace_access.policy_overrides
+      runs             = var.custom_workspace_access.runs
+      run_tasks        = var.custom_workspace_access.run_tasks
+      sentinel_mocks   = var.custom_workspace_access.sentinel_mocks
+      state_versions   = var.custom_workspace_access.state_versions
+      variables        = var.custom_workspace_access.variables
     }
   }
 
@@ -92,6 +96,7 @@ resource "tfe_team_access" "this" {
   dynamic "permissions" {
     for_each = var.workspace_permission != null ? [true] : []
     content {
+      policy_overrides  = var.workspace_permission.policy_overrides
       runs              = var.workspace_permission.runs
       run_tasks         = var.workspace_permission.run_tasks
       sentinel_mocks    = var.workspace_permission.sentinel_mocks
@@ -110,4 +115,26 @@ resource "tfe_team_access" "this" {
       error_message = "`workspace_permission` value must not be provided if access is provided."
     }
   }
+}
+
+locals {
+  notification_configurations = { for config in var.notification_configurations : config.name => config }
+}
+
+resource "tfe_team_notification_configuration" "this" {
+
+  for_each = toset(nonsensitive(keys(local.notification_configurations)))
+
+  name             = each.key
+  destination_type = local.notification_configurations[each.key].destination_type
+  email_addresses  = local.notification_configurations[each.key].email_addresses
+  email_user_ids   = local.notification_configurations[each.key].email_user_ids
+  enabled          = local.notification_configurations[each.key].enabled
+  team_id          = tfe_team.this.id
+  token            = local.notification_configurations[each.key].token
+  token_wo         = local.notification_configurations[each.key].token_wo
+  token_wo_version = local.notification_configurations[each.key].token_wo_version
+  triggers         = local.notification_configurations[each.key].triggers
+  url              = local.notification_configurations[each.key].url
+
 }

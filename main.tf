@@ -8,6 +8,8 @@ resource "tfe_organization" "this" {
   assessments_enforced                                    = var.assessments_enforced
   collaborator_auth_policy                                = var.collaborator_auth_policy
   cost_estimation_enabled                                 = var.cost_estimation_enabled
+  enforce_hyok                                            = var.enforce_hyok
+  max_ttl_enabled                                         = var.max_ttl_enabled || (var.audit_trail_token_max_ttl != null && var.audit_trail_token_max_ttl != "") || (var.org_token_max_ttl != null && var.org_token_max_ttl != "") || (var.team_token_max_ttl != null && var.team_token_max_ttl != "") || (var.user_token_max_ttl != null && var.user_token_max_ttl != "")
   owners_team_saml_role_id                                = var.owners_team_saml_role_id
   send_passing_statuses_for_untriggered_speculative_plans = var.send_passing_statuses_for_untriggered_speculative_plans
   session_remember_minutes                                = var.session_remember_minutes
@@ -15,6 +17,18 @@ resource "tfe_organization" "this" {
   speculative_plan_management_enabled                     = var.speculative_plan_management_enabled
   stacks_enabled                                          = var.stacks_enabled
   user_tokens_enabled                                     = var.user_tokens_enabled
+}
+
+# The following code block is used to manage the maximum TTL policy for API tokens in the organization.
+
+resource "tfe_org_max_token_ttl_policy" "this" {
+  count = (var.audit_trail_token_max_ttl != null && var.audit_trail_token_max_ttl != "") || (var.org_token_max_ttl != null && var.org_token_max_ttl != "") || (var.team_token_max_ttl != null && var.team_token_max_ttl != "") || (var.user_token_max_ttl != null && var.user_token_max_ttl != "") ? 1 : 0
+
+  organization              = tfe_organization.this.name
+  audit_trail_token_max_ttl = var.audit_trail_token_max_ttl != "" ? var.audit_trail_token_max_ttl : null
+  org_token_max_ttl         = var.org_token_max_ttl != "" ? var.org_token_max_ttl : null
+  team_token_max_ttl        = var.team_token_max_ttl != "" ? var.team_token_max_ttl : null
+  user_token_max_ttl        = var.user_token_max_ttl != "" ? var.user_token_max_ttl : null
 }
 
 # The following code block must be use to import de organization into terraform.  Once it's done, you can remove it.
@@ -53,16 +67,17 @@ module "agent_pool" {
 # The following code block is use to create and manage team at the organization level.
 
 module "teams" {
-  source                 = "./modules/tfe_team"
-  for_each               = nonsensitive({ for team in var.teams : team.name => team })
-  name                   = each.value.name
-  organization           = tfe_organization.this.name
-  organization_access    = try(each.value.organization_access, null)
-  sso_team_id            = try(each.value.sso_team_id, null)
-  token                  = try(each.value.token, false)
-  token_expired_at       = try(each.value.token_expired_at, null)
-  token_force_regenerate = try(each.value.token_force_regenerate, null)
-  visibility             = try(each.value.visibility, "organization")
+  source                        = "./modules/tfe_team"
+  for_each                      = nonsensitive({ for team in var.teams : team.name => team })
+  name                          = each.value.name
+  allow_member_token_management = try(each.value.allow_member_token_management, true)
+  organization                  = tfe_organization.this.name
+  organization_access           = try(each.value.organization_access, null)
+  sso_team_id                   = try(each.value.sso_team_id, null)
+  token                         = try(each.value.token, false)
+  token_expired_at              = try(each.value.token_expired_at, null)
+  token_force_regenerate        = try(each.value.token_force_regenerate, null)
+  visibility                    = try(each.value.visibility, "organization")
 }
 
 # The following code block is use to create and manage the project where all the workspaces related to the foundation will be stored.
