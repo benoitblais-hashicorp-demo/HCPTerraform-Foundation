@@ -66,6 +66,11 @@ module "agent_pool" {
 
 # The following code block is use to create and manage team at the organization level.
 
+resource "time_rotating" "teams_token" {
+  for_each      = nonsensitive({ for team in var.teams : team.name => team if try(team.token, false) })
+  rotation_days = each.value.token_rotation_days
+}
+
 module "teams" {
   source                        = "./modules/tfe_team"
   for_each                      = nonsensitive({ for team in var.teams : team.name => team })
@@ -75,7 +80,7 @@ module "teams" {
   organization_access           = try(each.value.organization_access, null)
   sso_team_id                   = try(each.value.sso_team_id, null)
   token                         = try(each.value.token, false)
-  token_expired_at              = try(each.value.token_expired_at, null)
+  token_expired_at              = try(time_rotating.teams_token[each.key].rotation_rfc3339, null)
   token_force_regenerate        = try(each.value.token_force_regenerate, null)
   visibility                    = try(each.value.visibility, "organization")
 }

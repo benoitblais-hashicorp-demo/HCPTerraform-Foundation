@@ -838,8 +838,8 @@ Description:   (Optional) The teams block supports the following:
     sso\_team\_id                  : (Optional) Unique Identifier to control team membership via SAML.  
     token                        : (Optional) If set to `true`, a team token will be generated.  
     token\_description            : (Optional) The token's description, which must be unique per team. Required if creating multiple tokens for a single team.  
-    token\_expired\_at             : (Optional) The token's expiration date. The expiration date must be a date/time string in RFC3339 format (e.g., '2024-12-31T23:59:59Z'). If no expiration date is supplied, the expiration date will default to null and never expire.  
     token\_force\_regenerate       : (Optional) If set to `true`, a new token will be generated even if a token already exists. This will invalidate the existing token!  
+    token\_rotation\_days          : (Optional) Number of days after which the team token will be automatically rotated. Defaults to `365`.  
     visibility                   : (Optional) The visibility of the team (`secret` or `organization`).
 
 Type:
@@ -869,8 +869,8 @@ list(object({
     sso_team_id            = optional(string)
     token                  = optional(bool, false)
     token_description      = optional(string)
-    token_expired_at       = optional(string)
     token_force_regenerate = optional(bool, false)
+    token_rotation_days    = optional(number, 365)
     visibility             = optional(string, "organization")
   }))
 ```
@@ -999,6 +999,7 @@ The following resources are used by this module:
 - [time_rotating.policies_factory_token](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/rotating) (resource)
 - [time_rotating.projects_factory_token](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/rotating) (resource)
 - [time_rotating.repositories_factory_token](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/rotating) (resource)
+- [time_rotating.teams_token](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/rotating) (resource)
 - [time_rotating.workspaces_factory_token](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/rotating) (resource)
 - [tfe_organization_membership.hcp_foundation_notification](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/data-sources/organization_membership) (data source)
 
