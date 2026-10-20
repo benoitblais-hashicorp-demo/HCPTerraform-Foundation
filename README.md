@@ -433,14 +433,6 @@ Default:
 }
 ```
 
-### <a name="input_hcp_foundation_tag_seed_workspace_tags"></a> [hcp\_foundation\_tag\_seed\_workspace\_tags](#input\_hcp\_foundation\_tag\_seed\_workspace\_tags)
-
-Description: (Optional) A map of key-value tags to assign to the tag seed workspace. This workspace exists solely to bootstrap tag values in the HCP Terraform organization so that `tfe_tag_policy_set` resources can reference them before any real workspace carries those tags. If `null`, the workspace will not be created.
-
-Type: `map(string)`
-
-Default: `null`
-
 ### <a name="input_max_ttl_enabled"></a> [max\_ttl\_enabled](#input\_max\_ttl\_enabled)
 
 Description: (Optional) Whether maximum token TTL policies are enabled for the organization. Defaults to `false`.
@@ -1003,8 +995,6 @@ The following resources are used by this module:
 - [tfe_variable.repositories_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.workspaces_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.workspaces_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
-- [tfe_workspace.tag_seed](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/workspace) (resource)
-- [tfe_workspace_settings.tag_seed](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/workspace_settings) (resource)
 - [time_rotating.modules_factory_token](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/rotating) (resource)
 - [time_rotating.policies_factory_token](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/rotating) (resource)
 - [time_rotating.projects_factory_token](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/rotating) (resource)
