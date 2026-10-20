@@ -80,7 +80,7 @@ module "teams" {
   organization_access           = try(each.value.organization_access, null)
   sso_team_id                   = try(each.value.sso_team_id, null)
   token                         = try(each.value.token, false)
-  token_expired_at              = try(time_rotating.teams_token[each.key].rotation_rfc3339, null)
+  token_expired_at              = each.value.token ? time_rotating.teams_token[each.key].rotation_rfc3339 : null
   token_force_regenerate        = try(each.value.token_force_regenerate, null)
   visibility                    = try(each.value.visibility, "organization")
 }
