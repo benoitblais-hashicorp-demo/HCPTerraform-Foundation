@@ -165,13 +165,6 @@ variable "hcp_foundation_project_notification_configurations" {
   }
 }
 
-variable "hcp_foundation_tag_seed_workspace_tags" {
-  description = "(Optional) A map of key-value tags to assign to the tag seed workspace. This workspace exists solely to bootstrap tag values in the HCP Terraform organization so that `tfe_tag_policy_set` resources can reference them before any real workspace carries those tags. If `null`, the workspace will not be created."
-  type        = map(string)
-  nullable    = true
-  default     = null
-}
-
 variable "hcp_foundation_project_tags" {
   description = "(Optional) A map of key-value tags to add to the project in HCP Terraform."
   type        = map(string)

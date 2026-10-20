@@ -150,26 +150,6 @@ locals {
   hcp_foundation_agent_pool_ids = { for agent_pool in tfe_agent_pool_allowed_projects.hcp_foundation : var.hcp_foundation_project_agent_pool_name => agent_pool.agent_pool_id }
 }
 
-# The following resource block is used to create a tag seed workspace. Its sole purpose is to bootstrap
-# key-value tag pairs in the HCP Terraform organization so that tfe_tag_policy_set resources can attach
-# to those tags before any real workspace carries them. This workspace is CLI-driven and holds no
-# Terraform code. It can safely be removed once the required tags exist on at least one real workspace.
-
-resource "tfe_workspace" "tag_seed" {
-  count        = var.hcp_foundation_tag_seed_workspace_tags != null ? 1 : 0
-  name         = "tag-seed"
-  description  = "Dummy workspace used exclusively to seed key-value tag pairs in the organization. Do not use this workspace for any Terraform operations. It can be removed once the required tags are present on at least one real workspace."
-  organization = tfe_organization.this.name
-  project_id   = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
-  tags         = var.hcp_foundation_tag_seed_workspace_tags
-}
-
-resource "tfe_workspace_settings" "tag_seed" {
-  count          = var.hcp_foundation_tag_seed_workspace_tags != null ? 1 : 0
-  workspace_id   = tfe_workspace.tag_seed[0].id
-  execution_mode = "local"
-}
-
 # *********************************************************************************************** #
 #                                       Policies Factory                                          #
 # *********************************************************************************************** #
