@@ -100,6 +100,8 @@ The following requirements are needed by this module:
 
 - <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) (~> 0.82)
 
+- <a name="requirement_time"></a> [time](#requirement\_time) (~> 0.14)
+
 ## Modules
 
 The following Modules are called:
@@ -320,7 +322,7 @@ Default: `true`
 
 ### <a name="input_audit_trail_token_max_ttl"></a> [audit\_trail\_token\_max\_ttl](#input\_audit\_trail\_token\_max\_ttl)
 
-Description: (Optional) Maximum lifespan allowed for audit trail tokens to access the organization's resources. Format is <number><unit> (e.g., '0.5h', '3w', '6mo', '2y'). Defaults to null.
+Description: (Optional) Maximum lifespan allowed for audit trail tokens to access the organization's resources. Only whole days are accepted, in the format <number>d (e.g., '90d', '365d', '731d'), because the provider and the HCP Terraform API do not count months and years the same way, which causes a permanent diff with those units. Defaults to null.
 
 Type: `string`
 
@@ -439,9 +441,9 @@ Type: `bool`
 
 Default: `false`
 
-### <a name="input_modules_factory_agent_pool_id"></a> [modules\_factory\_agent\_pool\_id](#input\_modules\_factory\_agent\_pool\_id)
+### <a name="input_modules_factory_agent_pool_name"></a> [modules\_factory\_agent\_pool\_name](#input\_modules\_factory\_agent\_pool\_name)
 
-Description: (Optional) The ID of an agent pool to assign to the workspace for the `modules factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
+Description: (Optional) The name of the agent pool to assign to the workspace for the `modules factory`. It must be the name set in `hcp_foundation_project_agent_pool_name`, because the agent pool is created by this code and its ID is retrieved automatically. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
 
 Type: `string`
 
@@ -500,6 +502,14 @@ Type: `map(string)`
 
 Default: `null`
 
+### <a name="input_modules_factory_token_rotation_days"></a> [modules\_factory\_token\_rotation\_days](#input\_modules\_factory\_token\_rotation\_days)
+
+Description: (Optional) Number of days before the team tokens of the `modules factory` expire. When this period is over, the next apply generates new tokens and updates the `TFE_TOKEN` variable of the workspace and the GitHub secret. It must not exceed the maximum TTL configured for team tokens in the organization. Defaults to `365`.
+
+Type: `number`
+
+Default: `365`
+
 ### <a name="input_modules_factory_workspace_name"></a> [modules\_factory\_workspace\_name](#input\_modules\_factory\_workspace\_name)
 
 Description: (Optional) Name of the workspace for the `modules factory`.
@@ -510,7 +520,7 @@ Default: `"HCPTerraform-ModulesFactory"`
 
 ### <a name="input_org_token_max_ttl"></a> [org\_token\_max\_ttl](#input\_org\_token\_max\_ttl)
 
-Description: (Optional) Maximum lifespan allowed for organization tokens to access the organization's resources. Format is <number><unit> (e.g., '0.5h', '3w', '6mo', '2y'). Defaults to null.
+Description: (Optional) Maximum lifespan allowed for organization tokens to access the organization's resources. Only whole days are accepted, in the format <number>d (e.g., '90d', '365d', '731d'), because the provider and the HCP Terraform API do not count months and years the same way, which causes a permanent diff with those units. Defaults to null.
 
 Type: `string`
 
@@ -524,9 +534,9 @@ Type: `string`
 
 Default: `null`
 
-### <a name="input_policies_factory_agent_pool_id"></a> [policies\_factory\_agent\_pool\_id](#input\_policies\_factory\_agent\_pool\_id)
+### <a name="input_policies_factory_agent_pool_name"></a> [policies\_factory\_agent\_pool\_name](#input\_policies\_factory\_agent\_pool\_name)
 
-Description: (Optional) The ID of an agent pool to assign to the workspace for the `policies factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
+Description: (Optional) The name of the agent pool to assign to the workspace for the `policies factory`. It must be the name set in `hcp_foundation_project_agent_pool_name`, because the agent pool is created by this code and its ID is retrieved automatically. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
 
 Type: `string`
 
@@ -585,6 +595,14 @@ Type: `map(string)`
 
 Default: `null`
 
+### <a name="input_policies_factory_token_rotation_days"></a> [policies\_factory\_token\_rotation\_days](#input\_policies\_factory\_token\_rotation\_days)
+
+Description: (Optional) Number of days before the team tokens of the `policies factory` expire. When this period is over, the next apply generates new tokens and updates the `TFE_TOKEN` variable of the workspace and the GitHub secret. It must not exceed the maximum TTL configured for team tokens in the organization. Defaults to `365`.
+
+Type: `number`
+
+Default: `365`
+
 ### <a name="input_policies_factory_workspace_name"></a> [policies\_factory\_workspace\_name](#input\_policies\_factory\_workspace\_name)
 
 Description: (Optional) Name of the workspace for the `policies factory`.
@@ -593,9 +611,9 @@ Type: `string`
 
 Default: `"HCPTerraform-PoliciesFactory"`
 
-### <a name="input_projects_factory_agent_pool_id"></a> [projects\_factory\_agent\_pool\_id](#input\_projects\_factory\_agent\_pool\_id)
+### <a name="input_projects_factory_agent_pool_name"></a> [projects\_factory\_agent\_pool\_name](#input\_projects\_factory\_agent\_pool\_name)
 
-Description: (Optional) The ID of an agent pool to assign to the workspace for the `projects factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
+Description: (Optional) The name of the agent pool to assign to the workspace for the `projects factory`. It must be the name set in `hcp_foundation_project_agent_pool_name`, because the agent pool is created by this code and its ID is retrieved automatically. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
 
 Type: `string`
 
@@ -654,6 +672,14 @@ Type: `map(string)`
 
 Default: `null`
 
+### <a name="input_projects_factory_token_rotation_days"></a> [projects\_factory\_token\_rotation\_days](#input\_projects\_factory\_token\_rotation\_days)
+
+Description: (Optional) Number of days before the team tokens of the `projects factory` expire. When this period is over, the next apply generates new tokens and updates the `TFE_TOKEN` variable of the workspace and the GitHub secret. It must not exceed the maximum TTL configured for team tokens in the organization. Defaults to `365`.
+
+Type: `number`
+
+Default: `365`
+
 ### <a name="input_projects_factory_workspace_name"></a> [projects\_factory\_workspace\_name](#input\_projects\_factory\_workspace\_name)
 
 Description: (Optional) Name of the workspace for the `projects factory`.
@@ -662,9 +688,9 @@ Type: `string`
 
 Default: `"HCPTerraform-ProjectsFactory"`
 
-### <a name="input_repositories_factory_agent_pool_id"></a> [repositories\_factory\_agent\_pool\_id](#input\_repositories\_factory\_agent\_pool\_id)
+### <a name="input_repositories_factory_agent_pool_name"></a> [repositories\_factory\_agent\_pool\_name](#input\_repositories\_factory\_agent\_pool\_name)
 
-Description: (Optional) The ID of an agent pool to assign to the workspace for the `repositories factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
+Description: (Optional) The name of the agent pool to assign to the workspace for the `repositories factory`. It must be the name set in `hcp_foundation_project_agent_pool_name`, because the agent pool is created by this code and its ID is retrieved automatically. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
 
 Type: `string`
 
@@ -723,6 +749,14 @@ Type: `map(string)`
 
 Default: `null`
 
+### <a name="input_repositories_factory_token_rotation_days"></a> [repositories\_factory\_token\_rotation\_days](#input\_repositories\_factory\_token\_rotation\_days)
+
+Description: (Optional) Number of days before the team tokens of the `repositories factory` expire. When this period is over, the next apply generates new tokens and updates the `TFE_TOKEN` variable of the workspace and the GitHub secret. It must not exceed the maximum TTL configured for team tokens in the organization. Defaults to `365`.
+
+Type: `number`
+
+Default: `365`
+
 ### <a name="input_repositories_factory_workspace_name"></a> [repositories\_factory\_workspace\_name](#input\_repositories\_factory\_workspace\_name)
 
 Description: (Optional) Name of the workspace for the `repositories factory`.
@@ -773,7 +807,7 @@ Default: `true`
 
 ### <a name="input_team_token_max_ttl"></a> [team\_token\_max\_ttl](#input\_team\_token\_max\_ttl)
 
-Description: (Optional) Maximum lifespan allowed for team tokens to access the organization's resources. Format is <number><unit> (e.g., '0.5h', '3w', '6mo', '2y'). Defaults to null.
+Description: (Optional) Maximum lifespan allowed for team tokens to access the organization's resources. Only whole days are accepted, in the format <number>d (e.g., '90d', '365d', '731d'), because the provider and the HCP Terraform API do not count months and years the same way, which causes a permanent diff with those units. Defaults to null.
 
 Type: `string`
 
@@ -845,7 +879,7 @@ Default: `[]`
 
 ### <a name="input_user_token_max_ttl"></a> [user\_token\_max\_ttl](#input\_user\_token\_max\_ttl)
 
-Description: (Optional) Maximum lifespan allowed for user tokens to access the organization's resources. Format is <number><unit> (e.g., '0.5h', '3w', '6mo', '2y'). Defaults to null.
+Description: (Optional) Maximum lifespan allowed for user tokens to access the organization's resources. Only whole days are accepted, in the format <number>d (e.g., '90d', '365d', '731d'), because the provider and the HCP Terraform API do not count months and years the same way, which causes a permanent diff with those units. Defaults to null.
 
 Type: `string`
 
@@ -859,9 +893,9 @@ Type: `bool`
 
 Default: `true`
 
-### <a name="input_workspaces_factory_agent_pool_id"></a> [workspaces\_factory\_agent\_pool\_id](#input\_workspaces\_factory\_agent\_pool\_id)
+### <a name="input_workspaces_factory_agent_pool_name"></a> [workspaces\_factory\_agent\_pool\_name](#input\_workspaces\_factory\_agent\_pool\_name)
 
-Description: (Optional) The ID of an agent pool to assign to the workspace for the `workspaces factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
+Description: (Optional) The name of the agent pool to assign to the workspace for the `workspaces factory`. It must be the name set in `hcp_foundation_project_agent_pool_name`, because the agent pool is created by this code and its ID is retrieved automatically. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value.
 
 Type: `string`
 
@@ -920,6 +954,14 @@ Type: `map(string)`
 
 Default: `null`
 
+### <a name="input_workspaces_factory_token_rotation_days"></a> [workspaces\_factory\_token\_rotation\_days](#input\_workspaces\_factory\_token\_rotation\_days)
+
+Description: (Optional) Number of days before the team tokens of the `workspaces factory` expire. When this period is over, the next apply generates new tokens and updates the `TFE_TOKEN` variable of the workspace and the GitHub secret. It must not exceed the maximum TTL configured for team tokens in the organization. Defaults to `365`.
+
+Type: `number`
+
+Default: `365`
+
 ### <a name="input_workspaces_factory_workspace_name"></a> [workspaces\_factory\_workspace\_name](#input\_workspaces\_factory\_workspace\_name)
 
 Description: (Optional) Name of the workspace for the `workspaces factory`.
@@ -953,6 +995,11 @@ The following resources are used by this module:
 - [tfe_variable.repositories_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.workspaces_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.workspaces_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+- [time_rotating.modules_factory_token](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/rotating) (resource)
+- [time_rotating.policies_factory_token](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/rotating) (resource)
+- [time_rotating.projects_factory_token](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/rotating) (resource)
+- [time_rotating.repositories_factory_token](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/rotating) (resource)
+- [time_rotating.workspaces_factory_token](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/rotating) (resource)
 - [tfe_organization_membership.hcp_foundation_notification](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/data-sources/organization_membership) (data source)
 
 ## Outputs

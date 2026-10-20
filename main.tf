@@ -139,6 +139,12 @@ resource "tfe_agent_pool_allowed_projects" "hcp_foundation" {
   allowed_project_ids = [tfe_project.hcp_foundation[0].id]
 }
 
+# The following local is used to retrieve the ID of the agent pool of the project from its name. The ID comes from the project access resource, so the workspaces only use the agent pool once the project is allowed to use it.
+
+locals {
+  hcp_foundation_agent_pool_ids = { for agent_pool in tfe_agent_pool_allowed_projects.hcp_foundation : var.hcp_foundation_project_agent_pool_name => agent_pool.agent_pool_id }
+}
+
 # *********************************************************************************************** #
 #                                       Policies Factory                                          #
 # *********************************************************************************************** #
@@ -149,12 +155,19 @@ module "policies_factory_workspace" {
   source         = "./modules/tfe_workspace"
   count          = var.policies_factory_workspace_name != null ? 1 : 0
   name           = lower(var.policies_factory_workspace_name)
-  agent_pool_id  = var.policies_factory_agent_pool_id
+  agent_pool_id  = var.policies_factory_agent_pool_name != null ? local.hcp_foundation_agent_pool_ids[var.policies_factory_agent_pool_name] : null
   description    = var.policies_factory_description
   execution_mode = var.policies_factory_execution_mode
   organization   = tfe_organization.this.name
   project_id     = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
   tags           = merge(var.policies_factory_tag, { managed_by_terraform = true })
+}
+
+# The following resource block is used to set the expiration date of the team tokens used by the `policies factory`. When the rotation date is reached, the next apply generates a new expiration date, which replaces the tokens and updates the places where they are used.
+
+resource "time_rotating" "policies_factory_token" {
+  count         = length(module.policies_factory_workspace) > 0 ? 1 : 0
+  rotation_days = var.policies_factory_token_rotation_days
 }
 
 # The following module blocks are used to create and manage the HCP Terraform teams required by the `policies factory`.
@@ -167,16 +180,18 @@ module "policies_factory_team_hcp" {
   organization_access = {
     manage_policies = true
   }
-  token = true
+  token            = true
+  token_expired_at = time_rotating.policies_factory_token[0].rotation_rfc3339
 }
 
 module "policies_factory_team_git" {
-  source       = "./modules/tfe_team"
-  count        = length(module.policies_factory_workspace) > 0 != null ? 1 : 0
-  name         = lower(replace("${module.policies_factory_workspace[0].workspace.name}-git", "/\\W|_|\\s/", "-"))
-  organization = tfe_organization.this.name
-  token        = true
-  workspace_id = module.policies_factory_workspace[0].id
+  source           = "./modules/tfe_team"
+  count            = length(module.policies_factory_workspace) > 0 != null ? 1 : 0
+  name             = lower(replace("${module.policies_factory_workspace[0].workspace.name}-git", "/\\W|_|\\s/", "-"))
+  organization     = tfe_organization.this.name
+  token            = true
+  token_expired_at = time_rotating.policies_factory_token[0].rotation_rfc3339
+  workspace_id     = module.policies_factory_workspace[0].id
   workspace_permission = {
     runs = "apply"
   }
@@ -233,12 +248,19 @@ module "modules_factory_workspace" {
   source         = "./modules/tfe_workspace"
   count          = var.modules_factory_workspace_name != null ? 1 : 0
   name           = lower(var.modules_factory_workspace_name)
-  agent_pool_id  = var.modules_factory_agent_pool_id
+  agent_pool_id  = var.modules_factory_agent_pool_name != null ? local.hcp_foundation_agent_pool_ids[var.modules_factory_agent_pool_name] : null
   description    = var.modules_factory_description
   execution_mode = var.modules_factory_execution_mode
   organization   = tfe_organization.this.name
   project_id     = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
   tags           = merge(var.modules_factory_tag, { managed_by_terraform = true })
+}
+
+# The following resource block is used to set the expiration date of the team tokens used by the `modules factory`. When the rotation date is reached, the next apply generates a new expiration date, which replaces the tokens and updates the places where they are used.
+
+resource "time_rotating" "modules_factory_token" {
+  count         = length(module.modules_factory_workspace) > 0 ? 1 : 0
+  rotation_days = var.modules_factory_token_rotation_days
 }
 
 # The following module blocks are used to create and manage the HCP Terraform teams required by the `modules factory`.
@@ -256,7 +278,8 @@ module "modules_factory_team_hcp" {
     manage_teams               = true
     manage_workspaces          = true
   }
-  token = true
+  token            = true
+  token_expired_at = time_rotating.modules_factory_token[0].rotation_rfc3339
 }
 
 module "modules_factory_team_git" {
@@ -268,8 +291,9 @@ module "modules_factory_team_git" {
     manage_projects   = true # This is required to be able to create workspace from no-code module through GitHub Actions.
     manage_workspaces = true # This is required to be able to create workspace from no-code module through GitHub Actions.
   }
-  token        = true
-  workspace_id = module.modules_factory_workspace[0].id
+  token            = true
+  token_expired_at = time_rotating.modules_factory_token[0].rotation_rfc3339
+  workspace_id     = module.modules_factory_workspace[0].id
   workspace_permission = {
     runs = "apply"
   }
@@ -338,12 +362,19 @@ module "projects_factory_workspace" {
   source         = "./modules/tfe_workspace"
   count          = var.projects_factory_workspace_name != null ? 1 : 0
   name           = lower(var.projects_factory_workspace_name)
-  agent_pool_id  = var.projects_factory_agent_pool_id
+  agent_pool_id  = var.projects_factory_agent_pool_name != null ? local.hcp_foundation_agent_pool_ids[var.projects_factory_agent_pool_name] : null
   description    = var.projects_factory_description
   execution_mode = var.projects_factory_execution_mode
   organization   = tfe_organization.this.name
   project_id     = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
   tags           = merge(var.projects_factory_tag, { managed_by_terraform = true })
+}
+
+# The following resource block is used to set the expiration date of the team tokens used by the `projects factory`. When the rotation date is reached, the next apply generates a new expiration date, which replaces the tokens and updates the places where they are used.
+
+resource "time_rotating" "projects_factory_token" {
+  count         = length(module.projects_factory_workspace) > 0 ? 1 : 0
+  rotation_days = var.projects_factory_token_rotation_days
 }
 
 # The following module blocks are used to create and manage the HCP Terraform teams required by the `projects factory`.
@@ -360,7 +391,8 @@ module "projects_factory_team_hcp" {
     manage_teams               = true
     manage_workspaces          = true
   }
-  token = true
+  token            = true
+  token_expired_at = time_rotating.projects_factory_token[0].rotation_rfc3339
 }
 
 module "projects_factory_team_git" {
@@ -372,8 +404,9 @@ module "projects_factory_team_git" {
     manage_projects   = true # This is required to be able to create workspace from no-code module through GitHub Actions.
     manage_workspaces = true # This is required to be able to create workspace from no-code module through GitHub Actions.
   }
-  token        = true
-  workspace_id = module.projects_factory_workspace[0].id
+  token            = true
+  token_expired_at = time_rotating.projects_factory_token[0].rotation_rfc3339
+  workspace_id     = module.projects_factory_workspace[0].id
   workspace_permission = {
     runs = "apply"
   }
@@ -442,12 +475,19 @@ module "workspaces_factory_workspace" {
   source         = "./modules/tfe_workspace"
   count          = var.workspaces_factory_workspace_name != null ? 1 : 0
   name           = lower(var.workspaces_factory_workspace_name)
-  agent_pool_id  = var.workspaces_factory_agent_pool_id
+  agent_pool_id  = var.workspaces_factory_agent_pool_name != null ? local.hcp_foundation_agent_pool_ids[var.workspaces_factory_agent_pool_name] : null
   description    = var.workspaces_factory_description
   execution_mode = var.workspaces_factory_execution_mode
   organization   = tfe_organization.this.name
   project_id     = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
   tags           = merge(var.workspaces_factory_tag, { managed_by_terraform = true })
+}
+
+# The following resource block is used to set the expiration date of the team tokens used by the `workspaces factory`. When the rotation date is reached, the next apply generates a new expiration date, which replaces the tokens and updates the places where they are used.
+
+resource "time_rotating" "workspaces_factory_token" {
+  count         = length(module.workspaces_factory_workspace) > 0 ? 1 : 0
+  rotation_days = var.workspaces_factory_token_rotation_days
 }
 
 # The following module blocks are used to create and manage the HCP Terraform teams required by the `workspaces factory`.
@@ -464,7 +504,8 @@ module "workspaces_factory_team_hcp" {
     manage_teams               = true
     manage_workspaces          = true
   }
-  token = true
+  token            = true
+  token_expired_at = time_rotating.workspaces_factory_token[0].rotation_rfc3339
 }
 
 module "workspaces_factory_team_git" {
@@ -476,8 +517,9 @@ module "workspaces_factory_team_git" {
     manage_projects   = true # This is required to be able to create workspace from no-code module through GitHub Actions.
     manage_workspaces = true # This is required to be able to create workspace from no-code module through GitHub Actions.
   }
-  token        = true
-  workspace_id = module.workspaces_factory_workspace[0].id
+  token            = true
+  token_expired_at = time_rotating.workspaces_factory_token[0].rotation_rfc3339
+  workspace_id     = module.workspaces_factory_workspace[0].id
   workspace_permission = {
     runs = "apply"
   }
@@ -546,12 +588,19 @@ module "repositories_factory_workspace" {
   source         = "./modules/tfe_workspace"
   count          = var.repositories_factory_workspace_name != null ? 1 : 0
   name           = lower(var.repositories_factory_workspace_name)
-  agent_pool_id  = var.repositories_factory_agent_pool_id
+  agent_pool_id  = var.repositories_factory_agent_pool_name != null ? local.hcp_foundation_agent_pool_ids[var.repositories_factory_agent_pool_name] : null
   description    = var.repositories_factory_description
   execution_mode = var.repositories_factory_execution_mode
   organization   = tfe_organization.this.name
   project_id     = length(tfe_project.hcp_foundation) > 0 ? tfe_project.hcp_foundation[0].id : null
   tags           = merge(var.repositories_factory_tag, { managed_by_terraform = true })
+}
+
+# The following resource block is used to set the expiration date of the team tokens used by the `repositories factory`. When the rotation date is reached, the next apply generates a new expiration date, which replaces the tokens and updates the places where they are used.
+
+resource "time_rotating" "repositories_factory_token" {
+  count         = length(module.repositories_factory_workspace) > 0 ? 1 : 0
+  rotation_days = var.repositories_factory_token_rotation_days
 }
 
 # The following module blocks are used to create and manage the HCP Terraform teams required by the `repositories factory`.
@@ -565,7 +614,8 @@ module "repositories_factory_team_hcp" {
     manage_projects   = true
     manage_workspaces = true
   }
-  token = true
+  token            = true
+  token_expired_at = time_rotating.repositories_factory_token[0].rotation_rfc3339
 }
 
 module "repositories_factory_team_git" {
@@ -577,8 +627,9 @@ module "repositories_factory_team_git" {
     manage_projects   = true # This is required to be able to create workspace from no-code module through GitHub Actions.
     manage_workspaces = true # This is required to be able to create workspace from no-code module through GitHub Actions.
   }
-  token        = true
-  workspace_id = module.repositories_factory_workspace[0].id
+  token            = true
+  token_expired_at = time_rotating.repositories_factory_token[0].rotation_rfc3339
+  workspace_id     = module.repositories_factory_workspace[0].id
   workspace_permission = {
     runs = "apply"
   }
