@@ -87,6 +87,7 @@ Currently, there are some HCP Terraform settings that are not fully exposed or s
 1. **Recoverable Items (Data Retention Policy)**: Enabling or configuring the retention window for deleted (recoverable) workspaces, networks, or other items is not yet possible through Terraform.
 2. **IP Allow List (Inbound Allow List)**: Restricting inbound access to HCP Terraform workspaces and API endpoints to specific IP ranges must be done natively in the UI.
 3. **External Email Recipients (Project Notifications)**: Email notifications to recipients outside the organization are not yet configurable through Terraform, because email\_addresses is only available on Terraform Enterprise. Only organization members (email\_users) can be set in code. Add external recipients manually in the project's notification settings in the UI.
+4. **Reserved Keys (Workspace Tag Keys)**: Reserved tag keys — such as keys that HCP Terraform treats as system-managed — cannot be created or managed through Terraform. If your organization requires reserved keys, they must be configured directly through the HCP Terraform UI under **Settings → Tag Keys**.
 
 ## Documentation
 
@@ -432,6 +433,22 @@ Default:
   "environment": "production"
 }
 ```
+
+### <a name="input_hcp_foundation_tag_seed_project_name"></a> [hcp\_foundation\_tag\_seed\_project\_name](#input\_hcp\_foundation\_tag\_seed\_project\_name)
+
+Description: (Optional) Name of the tag seed project in HCP Terraform. This project holds dummy workspaces whose sole purpose is to bootstrap key-value tag pairs in the organization so that `tfe_tag_policy_set` resources can reference them. The project and its workspaces are only created when `hcp_foundation_tag_seed_workspaces` is non-empty. Defaults to `"HCP Terraform Tags"`.
+
+Type: `string`
+
+Default: `"HCP Terraform Tags"`
+
+### <a name="input_hcp_foundation_tag_seed_workspaces"></a> [hcp\_foundation\_tag\_seed\_workspaces](#input\_hcp\_foundation\_tag\_seed\_workspaces)
+
+Description: (Optional) A list of key-value tag maps, one entry per unique tag value that must be seeded in the organization. Each entry creates one dummy workspace carrying that exact tag so that `tfe_tag_policy_set` resources can reference it. These workspaces can be removed once at least one real workspace carries the same tags. Defaults to an empty list (no project or workspaces are created).
+
+Type: `list(map(string))`
+
+Default: `[]`
 
 ### <a name="input_max_ttl_enabled"></a> [max\_ttl\_enabled](#input\_max\_ttl\_enabled)
 
@@ -985,6 +1002,7 @@ The following resources are used by this module:
 - [tfe_organization.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/organization) (resource)
 - [tfe_organization_default_settings.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/organization_default_settings) (resource)
 - [tfe_project.hcp_foundation](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/project) (resource)
+- [tfe_project.tag_seed](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/project) (resource)
 - [tfe_project_notification_configuration.hcp_foundation](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/project_notification_configuration) (resource)
 - [tfe_variable.modules_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.modules_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
@@ -995,6 +1013,8 @@ The following resources are used by this module:
 - [tfe_variable.repositories_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.workspaces_factory](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
 - [tfe_variable.workspaces_factory_organization_name](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/variable) (resource)
+- [tfe_workspace.tag_seed](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/workspace) (resource)
+- [tfe_workspace_settings.tag_seed](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/workspace_settings) (resource)
 - [time_rotating.modules_factory_token](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/rotating) (resource)
 - [time_rotating.policies_factory_token](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/rotating) (resource)
 - [time_rotating.projects_factory_token](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/rotating) (resource)

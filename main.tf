@@ -80,7 +80,7 @@ module "teams" {
   organization_access           = try(each.value.organization_access, null)
   sso_team_id                   = try(each.value.sso_team_id, null)
   token                         = try(each.value.token, false)
-  token_expired_at              = try(time_rotating.teams_token[each.key].rotation_rfc3339, null)
+  token_expired_at              = each.value.token ? time_rotating.teams_token[each.key].rotation_rfc3339 : null
   token_force_regenerate        = try(each.value.token_force_regenerate, null)
   visibility                    = try(each.value.visibility, "organization")
 }
@@ -148,6 +148,37 @@ resource "tfe_agent_pool_allowed_projects" "hcp_foundation" {
 
 locals {
   hcp_foundation_agent_pool_ids = { for agent_pool in tfe_agent_pool_allowed_projects.hcp_foundation : var.hcp_foundation_project_agent_pool_name => agent_pool.agent_pool_id }
+}
+
+# *********************************************************************************************** #
+#                                         Tag Seed                                                #
+# *********************************************************************************************** #
+
+# The following resource blocks create a dedicated project and one dummy CLI-driven workspace per
+# unique tag value that must exist in the organization before tfe_tag_policy_set resources can
+# reference them. Set `hcp_foundation_tag_seed_workspaces` to a non-empty list to enable creation.
+# Each entry in the list is a map of key-value tags assigned to one workspace. Remove these
+# workspaces (set the variable back to []) once the required tags are present on real workspaces.
+
+resource "tfe_project" "tag_seed" {
+  count        = length(var.hcp_foundation_tag_seed_workspaces) > 0 ? 1 : 0
+  name         = var.hcp_foundation_tag_seed_project_name
+  organization = tfe_organization.this.name
+}
+
+resource "tfe_workspace" "tag_seed" {
+  for_each     = { for idx, tags in var.hcp_foundation_tag_seed_workspaces : idx => tags }
+  name         = "tag-seed-${each.key}"
+  description  = "Dummy workspace used exclusively to seed key-value tag pairs in the organization. Do not use this workspace for any Terraform operations. It can be removed once the required tags are present on at least one real workspace."
+  organization = tfe_organization.this.name
+  project_id   = tfe_project.tag_seed[0].id
+  tags         = each.value
+}
+
+resource "tfe_workspace_settings" "tag_seed" {
+  for_each       = tfe_workspace.tag_seed
+  workspace_id   = each.value.id
+  execution_mode = "local"
 }
 
 # *********************************************************************************************** #

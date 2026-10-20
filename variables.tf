@@ -117,6 +117,20 @@ variable "hcp_foundation_project_name" {
   default     = "HCP Terraform"
 }
 
+variable "hcp_foundation_tag_seed_project_name" {
+  description = "(Optional) Name of the tag seed project in HCP Terraform. This project holds dummy workspaces whose sole purpose is to bootstrap key-value tag pairs in the organization so that `tfe_tag_policy_set` resources can reference them. The project and its workspaces are only created when `hcp_foundation_tag_seed_workspaces` is non-empty. Defaults to `\"HCP Terraform Tags\"`."
+  type        = string
+  nullable    = false
+  default     = "HCP Terraform Tags"
+}
+
+variable "hcp_foundation_tag_seed_workspaces" {
+  description = "(Optional) A list of key-value tag maps, one entry per unique tag value that must be seeded in the organization. Each entry creates one dummy workspace carrying that exact tag so that `tfe_tag_policy_set` resources can reference it. These workspaces can be removed once at least one real workspace carries the same tags. Defaults to an empty list (no project or workspaces are created)."
+  type        = list(map(string))
+  nullable    = false
+  default     = []
+}
+
 variable "hcp_foundation_project_notification_configurations" {
   description = <<EOT
   (Optional) A list of notification configurations for the project in HCP Terraform. A project can have up to 20 notification configurations, and they apply to all runs of all workspaces within the project.
