@@ -101,12 +101,6 @@ variable "homepage_url" {
   default     = null
 }
 
-variable "ignore_vulnerability_alerts_during_read" {
-  description = "(Optional) Set to true to not call the vulnerability alerts endpoint so the resource can also be used without admin permissions during read."
-  type        = bool
-  default     = false
-}
-
 variable "is_template" {
   description = "(Optional) Set to true to tell GitHub that this is a template repository."
   type        = bool
