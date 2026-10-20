@@ -24,7 +24,6 @@ resource "github_repository" "this" {
   archived                    = var.archived
   archive_on_destroy          = var.archive_on_destroy
   topics                      = var.topics
-  vulnerability_alerts        = var.vulnerability_alerts
   allow_update_branch         = var.allow_update_branch
 
   dynamic "pages" {
@@ -82,6 +81,11 @@ resource "github_repository" "this" {
     }
   }
 
+}
+
+resource "github_repository_vulnerability_alerts" "this" {
+  repository = github_repository.this.name
+  enabled    = var.vulnerability_alerts
 }
 
 resource "github_branch_protection" "this" {

@@ -85,6 +85,7 @@ The following resources are used by this module:
 
 - [github_branch_protection.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/branch_protection) (resource)
 - [github_repository.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository) (resource)
+- [github_repository_vulnerability_alerts.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_vulnerability_alerts) (resource)
 
 ## Required Inputs
 
@@ -316,14 +317,6 @@ Description: (Optional) URL of a page describing the project.
 Type: `string`
 
 Default: `null`
-
-### <a name="input_ignore_vulnerability_alerts_during_read"></a> [ignore\_vulnerability\_alerts\_during\_read](#input\_ignore\_vulnerability\_alerts\_during\_read)
-
-Description: (Optional) Set to true to not call the vulnerability alerts endpoint so the resource can also be used without admin permissions during read.
-
-Type: `bool`
-
-Default: `false`
 
 ### <a name="input_is_template"></a> [is\_template](#input\_is\_template)
 

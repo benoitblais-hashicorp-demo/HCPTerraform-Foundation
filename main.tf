@@ -8,6 +8,8 @@ resource "tfe_organization" "this" {
   assessments_enforced                                    = var.assessments_enforced
   collaborator_auth_policy                                = var.collaborator_auth_policy
   cost_estimation_enabled                                 = var.cost_estimation_enabled
+  enforce_hyok                                            = var.enforce_hyok
+  max_ttl_enabled                                         = var.max_ttl_enabled || (var.audit_trail_token_max_ttl != null && var.audit_trail_token_max_ttl != "") || (var.org_token_max_ttl != null && var.org_token_max_ttl != "") || (var.team_token_max_ttl != null && var.team_token_max_ttl != "") || (var.user_token_max_ttl != null && var.user_token_max_ttl != "")
   owners_team_saml_role_id                                = var.owners_team_saml_role_id
   send_passing_statuses_for_untriggered_speculative_plans = var.send_passing_statuses_for_untriggered_speculative_plans
   session_remember_minutes                                = var.session_remember_minutes
@@ -15,6 +17,18 @@ resource "tfe_organization" "this" {
   speculative_plan_management_enabled                     = var.speculative_plan_management_enabled
   stacks_enabled                                          = var.stacks_enabled
   user_tokens_enabled                                     = var.user_tokens_enabled
+}
+
+# The following code block is used to manage the maximum TTL policy for API tokens in the organization.
+
+resource "tfe_org_max_token_ttl_policy" "this" {
+  count = (var.audit_trail_token_max_ttl != null && var.audit_trail_token_max_ttl != "") || (var.org_token_max_ttl != null && var.org_token_max_ttl != "") || (var.team_token_max_ttl != null && var.team_token_max_ttl != "") || (var.user_token_max_ttl != null && var.user_token_max_ttl != "") ? 1 : 0
+
+  organization              = tfe_organization.this.name
+  audit_trail_token_max_ttl = var.audit_trail_token_max_ttl != "" ? var.audit_trail_token_max_ttl : null
+  org_token_max_ttl         = var.org_token_max_ttl != "" ? var.org_token_max_ttl : null
+  team_token_max_ttl        = var.team_token_max_ttl != "" ? var.team_token_max_ttl : null
+  user_token_max_ttl        = var.user_token_max_ttl != "" ? var.user_token_max_ttl : null
 }
 
 # The following code block must be use to import de organization into terraform.  Once it's done, you can remove it.
@@ -53,16 +67,17 @@ module "agent_pool" {
 # The following code block is use to create and manage team at the organization level.
 
 module "teams" {
-  source                 = "./modules/tfe_team"
-  for_each               = nonsensitive({ for team in var.teams : team.name => team })
-  name                   = each.value.name
-  organization           = tfe_organization.this.name
-  organization_access    = try(each.value.organization_access, null)
-  sso_team_id            = try(each.value.sso_team_id, null)
-  token                  = try(each.value.token, false)
-  token_expired_at       = try(each.value.token_expired_at, null)
-  token_force_regenerate = try(each.value.token_force_regenerate, null)
-  visibility             = try(each.value.visibility, "organization")
+  source                        = "./modules/tfe_team"
+  for_each                      = nonsensitive({ for team in var.teams : team.name => team })
+  name                          = each.value.name
+  allow_member_token_management = try(each.value.allow_member_token_management, true)
+  organization                  = tfe_organization.this.name
+  organization_access           = try(each.value.organization_access, null)
+  sso_team_id                   = try(each.value.sso_team_id, null)
+  token                         = try(each.value.token, false)
+  token_expired_at              = try(each.value.token_expired_at, null)
+  token_force_regenerate        = try(each.value.token_force_regenerate, null)
+  visibility                    = try(each.value.visibility, "organization")
 }
 
 # The following code block is use to create and manage the project where all the workspaces related to the foundation will be stored.
@@ -125,7 +140,7 @@ module "policies_factory_team_git" {
 resource "tfe_variable" "policies_factory" {
   count        = length(module.policies_factory_team_hcp) > 0 ? 1 : 0
   key          = "TFE_TOKEN"
-  value        = module.policies_factory_team_hcp[0].token
+  value_wo     = module.policies_factory_team_hcp[0].token
   category     = "env"
   sensitive    = true
   workspace_id = module.policies_factory_workspace[0].id
@@ -144,10 +159,10 @@ module "policies_factory_repository" {
 # The following resource block is used to create and manage an action secret at the repository level for the `policies factory`.
 
 resource "github_actions_secret" "policies_factory" {
-  count           = length(module.policies_factory_repository) > 0 ? 1 : 0
-  repository      = module.policies_factory_repository[0].repository.name
-  secret_name     = "TFE_TOKEN"
-  plaintext_value = module.policies_factory_team_git[0].token
+  count       = length(module.policies_factory_repository) > 0 ? 1 : 0
+  repository  = module.policies_factory_repository[0].repository.name
+  secret_name = "TFE_TOKEN"
+  value       = module.policies_factory_team_git[0].token
 }
 
 # The following module block is used to create and manage a GitHub team for the `policies factory`.
@@ -218,7 +233,7 @@ module "modules_factory_team_git" {
 resource "tfe_variable" "modules_factory" {
   count        = length(module.modules_factory_team_hcp) > 0 ? 1 : 0
   key          = "TFE_TOKEN"
-  value        = module.modules_factory_team_hcp[0].token
+  value_wo     = module.modules_factory_team_hcp[0].token
   category     = "env"
   sensitive    = true
   workspace_id = module.modules_factory_workspace[0].id
@@ -229,7 +244,7 @@ resource "tfe_variable" "modules_factory" {
 resource "tfe_variable" "modules_factory_organization_name" {
   count        = length(module.modules_factory_team_hcp) > 0 ? 1 : 0
   key          = "organization_name"
-  value        = var.organization_name
+  value_wo     = var.organization_name
   category     = "terraform"
   description  = "(Required) Name of the organization."
   sensitive    = false
@@ -249,10 +264,10 @@ module "modules_factory_repository" {
 # The following resource block is used to create and manage an action secret at the repository level for the `modules factory`.
 
 resource "github_actions_secret" "modules_factory" {
-  count           = length(module.modules_factory_repository) > 0 ? 1 : 0
-  repository      = module.modules_factory_repository[0].repository.name
-  secret_name     = "TFE_TOKEN"
-  plaintext_value = module.modules_factory_team_git[0].token
+  count       = length(module.modules_factory_repository) > 0 ? 1 : 0
+  repository  = module.modules_factory_repository[0].repository.name
+  secret_name = "TFE_TOKEN"
+  value       = module.modules_factory_team_git[0].token
 }
 
 # The following module block is used to create and manage a GitHub team for the `modules factory`.
@@ -322,7 +337,7 @@ module "projects_factory_team_git" {
 resource "tfe_variable" "projects_factory" {
   count        = length(module.projects_factory_team_hcp) > 0 ? 1 : 0
   key          = "TFE_TOKEN"
-  value        = module.projects_factory_team_hcp[0].token
+  value_wo     = module.projects_factory_team_hcp[0].token
   category     = "env"
   sensitive    = true
   workspace_id = module.projects_factory_workspace[0].id
@@ -333,7 +348,7 @@ resource "tfe_variable" "projects_factory" {
 resource "tfe_variable" "projects_factory_organization_name" {
   count        = length(module.projects_factory_team_hcp) > 0 ? 1 : 0
   key          = "organization_name"
-  value        = var.organization_name
+  value_wo     = var.organization_name
   category     = "terraform"
   description  = "(Required) Name of the organization."
   sensitive    = false
@@ -353,10 +368,10 @@ module "projects_factory_repository" {
 # The following resource block is used to create and manage an action secret at the repository level for the `projects factory`.
 
 resource "github_actions_secret" "projects_factory" {
-  count           = length(module.projects_factory_repository) > 0 ? 1 : 0
-  repository      = module.projects_factory_repository[0].repository.name
-  secret_name     = "TFE_TOKEN"
-  plaintext_value = module.projects_factory_team_git[0].token
+  count       = length(module.projects_factory_repository) > 0 ? 1 : 0
+  repository  = module.projects_factory_repository[0].repository.name
+  secret_name = "TFE_TOKEN"
+  value       = module.projects_factory_team_git[0].token
 }
 
 # The following module block is used to create and manage a GitHub team for the `projects factory`.
@@ -426,7 +441,7 @@ module "workspaces_factory_team_git" {
 resource "tfe_variable" "workspaces_factory" {
   count        = length(module.workspaces_factory_team_hcp) > 0 ? 1 : 0
   key          = "TFE_TOKEN"
-  value        = module.workspaces_factory_team_hcp[0].token
+  value_wo     = module.workspaces_factory_team_hcp[0].token
   category     = "env"
   sensitive    = true
   workspace_id = module.workspaces_factory_workspace[0].id
@@ -437,7 +452,7 @@ resource "tfe_variable" "workspaces_factory" {
 resource "tfe_variable" "workspaces_factory_organization_name" {
   count        = length(module.workspaces_factory_team_hcp) > 0 ? 1 : 0
   key          = "organization_name"
-  value        = var.organization_name
+  value_wo     = var.organization_name
   category     = "terraform"
   description  = "(Required) Name of the organization."
   sensitive    = false
@@ -457,10 +472,10 @@ module "workspaces_factory_repository" {
 # The following resource block is used to create and manage an action secret at the repository level for the `workspaces factory`.
 
 resource "github_actions_secret" "workspaces_factory" {
-  count           = length(module.workspaces_factory_repository) > 0 ? 1 : 0
-  repository      = module.workspaces_factory_repository[0].repository.name
-  secret_name     = "TFE_TOKEN"
-  plaintext_value = module.workspaces_factory_team_git[0].token
+  count       = length(module.workspaces_factory_repository) > 0 ? 1 : 0
+  repository  = module.workspaces_factory_repository[0].repository.name
+  secret_name = "TFE_TOKEN"
+  value       = module.workspaces_factory_team_git[0].token
 }
 
 # The following module block is used to create and manage a GitHub team for the `workspaces factory`.
@@ -527,7 +542,7 @@ module "repositories_factory_team_git" {
 resource "tfe_variable" "repositories_factory" {
   count        = length(module.repositories_factory_team_hcp) > 0 ? 1 : 0
   key          = "TFE_TOKEN"
-  value        = module.repositories_factory_team_hcp[0].token
+  value_wo     = module.repositories_factory_team_hcp[0].token
   category     = "env"
   sensitive    = true
   workspace_id = module.repositories_factory_workspace[0].id
@@ -538,7 +553,7 @@ resource "tfe_variable" "repositories_factory" {
 resource "tfe_variable" "repositories_factory_organization_name" {
   count        = length(module.repositories_factory_team_hcp) > 0 ? 1 : 0
   key          = "organization_name"
-  value        = var.organization_name
+  value_wo     = var.organization_name
   category     = "terraform"
   description  = "(Required) Name of the organization."
   sensitive    = false
@@ -558,10 +573,10 @@ module "repositories_factory_repository" {
 # The following resource block is used to create and manage an action secret at the repository level for the `repositories factory`.
 
 resource "github_actions_secret" "repositories_factory" {
-  count           = length(module.repositories_factory_repository) > 0 ? 1 : 0
-  repository      = module.repositories_factory_repository[0].repository.name
-  secret_name     = "TFE_TOKEN"
-  plaintext_value = module.repositories_factory_team_git[0].token
+  count       = length(module.repositories_factory_repository) > 0 ? 1 : 0
+  repository  = module.repositories_factory_repository[0].repository.name
+  secret_name = "TFE_TOKEN"
+  value       = module.repositories_factory_team_git[0].token
 }
 
 # The following module block is used to create and manage a GitHub team for the `repositories factory`.

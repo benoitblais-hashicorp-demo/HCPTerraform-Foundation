@@ -35,14 +35,14 @@ variable "allow_update_branch" {
   default     = false
 }
 
-variable "archived" {
-  description = "(Optional) Specifies if the repository should be archived. NOTE Currently, the API does not support unarchiving."
+variable "archive_on_destroy" {
+  description = "(Optional) Set to true to archive the repository instead of deleting on destroy."
   type        = bool
   default     = false
 }
 
-variable "archive_on_destroy" {
-  description = "(Optional) Set to true to archive the repository instead of deleting on destroy."
+variable "archived" {
+  description = "(Optional) Specifies if the repository should be archived. NOTE Currently, the API does not support unarchiving."
   type        = bool
   default     = false
 }
@@ -99,12 +99,6 @@ variable "homepage_url" {
   description = "(Optional) URL of a page describing the project."
   type        = string
   default     = null
-}
-
-variable "ignore_vulnerability_alerts_during_read" {
-  description = "(Optional) Set to true to not call the vulnerability alerts endpoint so the resource can also be used without admin permissions during read."
-  type        = bool
-  default     = false
 }
 
 variable "is_template" {

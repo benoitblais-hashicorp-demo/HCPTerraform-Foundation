@@ -98,7 +98,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_github"></a> [github](#requirement\_github) (~> 6.13.0)
 
-- <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) (~> 0.79)
+- <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) (~> 0.82)
 
 ## Modules
 
@@ -318,6 +318,14 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_audit_trail_token_max_ttl"></a> [audit\_trail\_token\_max\_ttl](#input\_audit\_trail\_token\_max\_ttl)
+
+Description: (Optional) Maximum lifespan allowed for audit trail tokens to access the organization's resources. Format is <number><unit> (e.g., '0.5h', '3w', '6mo', '2y'). Defaults to null.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_collaborator_auth_policy"></a> [collaborator\_auth\_policy](#input\_collaborator\_auth\_policy)
 
 Description: (Optional) Authentication policy. Valid values are `password` or `two_factor_mandatory`. Default to `two_factor_mandatory`.
@@ -336,11 +344,19 @@ Default: `true`
 
 ### <a name="input_default_execution_mode"></a> [default\_execution\_mode](#input\_default\_execution\_mode)
 
-Description:  (Optional) Which execution mode to use as the default for all workspaces in the organization. Valid values are `remote`, `local` or `agent`. Default to `remote`.
+Description: (Optional) Which execution mode to use as the default for all workspaces in the organization. Valid values are `remote`, `local` or `agent`. Default to `remote`.
 
 Type: `string`
 
 Default: `"remote"`
+
+### <a name="input_enforce_hyok"></a> [enforce\_hyok](#input\_enforce\_hyok)
+
+Description: (Optional) (Available only in HCP Terraform) Whether HYOK is enabled for all new workspaces in the organization. Defaults to `false`.
+
+Type: `bool`
+
+Default: `false`
 
 ### <a name="input_hcp_foundation_project_description"></a> [hcp\_foundation\_project\_description](#input\_hcp\_foundation\_project\_description)
 
@@ -365,6 +381,14 @@ Description: (Optional) A map of key-value tags to add to the project in HCP Ter
 Type: `map(string)`
 
 Default: `null`
+
+### <a name="input_max_ttl_enabled"></a> [max\_ttl\_enabled](#input\_max\_ttl\_enabled)
+
+Description: (Optional) Whether maximum token TTL policies are enabled for the organization. Defaults to `false`.
+
+Type: `bool`
+
+Default: `false`
 
 ### <a name="input_modules_factory_agent_pool_id"></a> [modules\_factory\_agent\_pool\_id](#input\_modules\_factory\_agent\_pool\_id)
 
@@ -434,6 +458,14 @@ Description: (Optional) Name of the workspace for the `modules factory`.
 Type: `string`
 
 Default: `"HCPTerraform-ModulesFactory"`
+
+### <a name="input_org_token_max_ttl"></a> [org\_token\_max\_ttl](#input\_org\_token\_max\_ttl)
+
+Description: (Optional) Maximum lifespan allowed for organization tokens to access the organization's resources. Format is <number><unit> (e.g., '0.5h', '3w', '6mo', '2y'). Defaults to null.
+
+Type: `string`
+
+Default: `null`
 
 ### <a name="input_owners_team_saml_role_id"></a> [owners\_team\_saml\_role\_id](#input\_owners\_team\_saml\_role\_id)
 
@@ -690,19 +722,29 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_team_token_max_ttl"></a> [team\_token\_max\_ttl](#input\_team\_token\_max\_ttl)
+
+Description: (Optional) Maximum lifespan allowed for team tokens to access the organization's resources. Format is <number><unit> (e.g., '0.5h', '3w', '6mo', '2y'). Defaults to null.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_teams"></a> [teams](#input\_teams)
 
 Description:   (Optional) The teams block supports the following:  
-    name                         : (Required) Name of the team.   
-    organization\_access          : (Optional) The organization\_access supports the following:  
+    name                          : (Required) Name of the team.  
+    allow\_member\_token\_management : (Optional) Whether team members can manage team tokens. Used by Owners and users with Manage Teams permissions. Defaults to `true`.  
+    organization\_access           : (Optional) The organization\_access supports the following:  
       access\_secret\_teams        : (Optional) Allow members access to secret teams up to the level of permissions granted by their team permissions setting.  
+      delegate\_policy\_overrides  : (Optional) When this setting is enabled for a team, its members can override failed policy evaluations on projects and workspaces they manage.  
       manage\_agent\_pools         : (Optional) Allow members to create, edit, and delete agent pools within their organization.  
       manage\_membership          : (Optional) Allow members to add/remove users from the organization, and to add/remove users from visible teams.  
       manage\_modules             : (Optional) Allow members to publish and delete modules in the organization's private registry.  
       manage\_organization\_access : (Optional) Allow members to update the organization access settings of teams.  
       manage\_policies            : (Optional) Allows members to create, edit, and delete the organization's Sentinel policies.  
       manage\_policy\_overrides    : (Optional) Allows members to override soft-mandatory policy checks.  
-      manage\_projects            : (Optional) Allow members to create and administrate all projects within the organization.  
+      manage\_projects            : (Optional) Allow members to create and administrate all projects within the organization. Requires `manage_workspaces` to be set to `true`.  
       manage\_providers           : (Optional) Allow members to publish and delete providers in the organization's private registry.  
       manage\_run\_tasks           : (Optional) Allow members to create, edit, and delete the organization's run tasks.  
       manage\_teams               : (Optional) Allow members to create, update, and delete teams.  
@@ -721,9 +763,11 @@ Type:
 
 ```hcl
 list(object({
-    name = string
+    name                          = string
+    allow_member_token_management = optional(bool, true)
     organization_access = optional(object({
       access_secret_teams        = optional(bool, false)
+      delegate_policy_overrides  = optional(bool, false)
       manage_agent_pools         = optional(bool, false)
       manage_membership          = optional(bool, false)
       manage_modules             = optional(bool, false)
@@ -749,6 +793,14 @@ list(object({
 ```
 
 Default: `[]`
+
+### <a name="input_user_token_max_ttl"></a> [user\_token\_max\_ttl](#input\_user\_token\_max\_ttl)
+
+Description: (Optional) Maximum lifespan allowed for user tokens to access the organization's resources. Format is <number><unit> (e.g., '0.5h', '3w', '6mo', '2y'). Defaults to null.
+
+Type: `string`
+
+Default: `null`
 
 ### <a name="input_user_tokens_enabled"></a> [user\_tokens\_enabled](#input\_user\_tokens\_enabled)
 
@@ -836,6 +888,7 @@ The following resources are used by this module:
 - [github_actions_secret.projects_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
 - [github_actions_secret.repositories_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
 - [github_actions_secret.workspaces_factory](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
+- [tfe_org_max_token_ttl_policy.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/org_max_token_ttl_policy) (resource)
 - [tfe_organization.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/organization) (resource)
 - [tfe_organization_default_settings.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/organization_default_settings) (resource)
 - [tfe_project.hcp_foundation](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/project) (resource)
