@@ -180,11 +180,16 @@ variable "max_ttl_enabled" {
   default     = false
 }
 
-variable "modules_factory_agent_pool_id" {
-  description = "(Optional) The ID of an agent pool to assign to the workspace for the `modules factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value."
+variable "modules_factory_agent_pool_name" {
+  description = "(Optional) The name of the agent pool to assign to the workspace for the `modules factory`. It must be the name set in `hcp_foundation_project_agent_pool_name`, because the agent pool is created by this code and its ID is retrieved automatically. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value."
   type        = string
   nullable    = true
   default     = null
+
+  validation {
+    condition     = var.modules_factory_agent_pool_name == null || (var.hcp_foundation_project_name != null && var.modules_factory_agent_pool_name == var.hcp_foundation_project_agent_pool_name)
+    error_message = "`modules_factory_agent_pool_name` must match `hcp_foundation_project_agent_pool_name`, and `hcp_foundation_project_name` must be set."
+  }
 }
 
 variable "modules_factory_description" {
@@ -231,6 +236,18 @@ variable "modules_factory_tag" {
   type        = map(string)
   nullable    = true
   default     = null
+}
+
+variable "modules_factory_token_rotation_days" {
+  description = "(Optional) Number of days before the team tokens of the `modules factory` expire. When this period is over, the next apply generates new tokens and updates the `TFE_TOKEN` variable of the workspace and the GitHub secret. It must not exceed the maximum TTL configured for team tokens in the organization. Defaults to `365`."
+  type        = number
+  nullable    = false
+  default     = 365
+
+  validation {
+    condition     = var.modules_factory_token_rotation_days >= 1 && var.modules_factory_token_rotation_days == floor(var.modules_factory_token_rotation_days)
+    error_message = "`modules_factory_token_rotation_days` must be a whole number greater than or equal to 1."
+  }
 }
 
 variable "modules_factory_workspace_name" {
@@ -336,11 +353,16 @@ variable "policies_factory_workspace_name" {
   default     = "HCPTerraform-PoliciesFactory"
 }
 
-variable "projects_factory_agent_pool_id" {
-  description = "(Optional) The ID of an agent pool to assign to the workspace for the `projects factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value."
+variable "projects_factory_agent_pool_name" {
+  description = "(Optional) The name of the agent pool to assign to the workspace for the `projects factory`. It must be the name set in `hcp_foundation_project_agent_pool_name`, because the agent pool is created by this code and its ID is retrieved automatically. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value."
   type        = string
   nullable    = true
   default     = null
+
+  validation {
+    condition     = var.projects_factory_agent_pool_name == null || (var.hcp_foundation_project_name != null && var.projects_factory_agent_pool_name == var.hcp_foundation_project_agent_pool_name)
+    error_message = "`projects_factory_agent_pool_name` must match `hcp_foundation_project_agent_pool_name`, and `hcp_foundation_project_name` must be set."
+  }
 }
 
 variable "projects_factory_description" {
@@ -389,6 +411,18 @@ variable "projects_factory_tag" {
   default     = null
 }
 
+variable "projects_factory_token_rotation_days" {
+  description = "(Optional) Number of days before the team tokens of the `projects factory` expire. When this period is over, the next apply generates new tokens and updates the `TFE_TOKEN` variable of the workspace and the GitHub secret. It must not exceed the maximum TTL configured for team tokens in the organization. Defaults to `365`."
+  type        = number
+  nullable    = false
+  default     = 365
+
+  validation {
+    condition     = var.projects_factory_token_rotation_days >= 1 && var.projects_factory_token_rotation_days == floor(var.projects_factory_token_rotation_days)
+    error_message = "`projects_factory_token_rotation_days` must be a whole number greater than or equal to 1."
+  }
+}
+
 variable "projects_factory_workspace_name" {
   description = "(Optional) Name of the workspace for the `projects factory`."
   type        = string
@@ -396,11 +430,16 @@ variable "projects_factory_workspace_name" {
   default     = "HCPTerraform-ProjectsFactory"
 }
 
-variable "repositories_factory_agent_pool_id" {
-  description = "(Optional) The ID of an agent pool to assign to the workspace for the `repositories factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value."
+variable "repositories_factory_agent_pool_name" {
+  description = "(Optional) The name of the agent pool to assign to the workspace for the `repositories factory`. It must be the name set in `hcp_foundation_project_agent_pool_name`, because the agent pool is created by this code and its ID is retrieved automatically. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value."
   type        = string
   nullable    = true
   default     = null
+
+  validation {
+    condition     = var.repositories_factory_agent_pool_name == null || (var.hcp_foundation_project_name != null && var.repositories_factory_agent_pool_name == var.hcp_foundation_project_agent_pool_name)
+    error_message = "`repositories_factory_agent_pool_name` must match `hcp_foundation_project_agent_pool_name`, and `hcp_foundation_project_name` must be set."
+  }
 }
 
 variable "repositories_factory_description" {
@@ -447,6 +486,18 @@ variable "repositories_factory_tag" {
   type        = map(string)
   nullable    = true
   default     = null
+}
+
+variable "repositories_factory_token_rotation_days" {
+  description = "(Optional) Number of days before the team tokens of the `repositories factory` expire. When this period is over, the next apply generates new tokens and updates the `TFE_TOKEN` variable of the workspace and the GitHub secret. It must not exceed the maximum TTL configured for team tokens in the organization. Defaults to `365`."
+  type        = number
+  nullable    = false
+  default     = 365
+
+  validation {
+    condition     = var.repositories_factory_token_rotation_days >= 1 && var.repositories_factory_token_rotation_days == floor(var.repositories_factory_token_rotation_days)
+    error_message = "`repositories_factory_token_rotation_days` must be a whole number greater than or equal to 1."
+  }
 }
 
 variable "repositories_factory_workspace_name" {
@@ -602,11 +653,16 @@ variable "user_tokens_enabled" {
   default     = true
 }
 
-variable "workspaces_factory_agent_pool_id" {
-  description = "(Optional) The ID of an agent pool to assign to the workspace for the `workspaces factory`. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value."
+variable "workspaces_factory_agent_pool_name" {
+  description = "(Optional) The name of the agent pool to assign to the workspace for the `workspaces factory`. It must be the name set in `hcp_foundation_project_agent_pool_name`, because the agent pool is created by this code and its ID is retrieved automatically. Requires `execution_mode` to be set to `agent`. This value must not be provided if `execution_mode` is set to any other value."
   type        = string
   nullable    = true
   default     = null
+
+  validation {
+    condition     = var.workspaces_factory_agent_pool_name == null || (var.hcp_foundation_project_name != null && var.workspaces_factory_agent_pool_name == var.hcp_foundation_project_agent_pool_name)
+    error_message = "`workspaces_factory_agent_pool_name` must match `hcp_foundation_project_agent_pool_name`, and `hcp_foundation_project_name` must be set."
+  }
 }
 
 variable "workspaces_factory_description" {
@@ -653,6 +709,18 @@ variable "workspaces_factory_tag" {
   type        = map(string)
   nullable    = true
   default     = null
+}
+
+variable "workspaces_factory_token_rotation_days" {
+  description = "(Optional) Number of days before the team tokens of the `workspaces factory` expire. When this period is over, the next apply generates new tokens and updates the `TFE_TOKEN` variable of the workspace and the GitHub secret. It must not exceed the maximum TTL configured for team tokens in the organization. Defaults to `365`."
+  type        = number
+  nullable    = false
+  default     = 365
+
+  validation {
+    condition     = var.workspaces_factory_token_rotation_days >= 1 && var.workspaces_factory_token_rotation_days == floor(var.workspaces_factory_token_rotation_days)
+    error_message = "`workspaces_factory_token_rotation_days` must be a whole number greater than or equal to 1."
+  }
 }
 
 variable "workspaces_factory_workspace_name" {
